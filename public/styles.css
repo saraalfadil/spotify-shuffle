@@ -1,17 +1,13 @@
 body {
     background-color: #000;
-    background-repeat: no-repeat;
-    background-position: 20%;
-    background-size: cover;
     color: #fff;
+    font-family: 'Open Sans', sans-serif;
+    margin: 0px;
 }
 
 #main {
-    background-color: rgb(0 0 0 / 90%);
-    /*border: 3px dashed rgb(240 109 6 / 20%);*/
-    margin-top: 1em;
-    text-align: center;
-    height: 1200px;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 .heading {
@@ -19,30 +15,50 @@ body {
     margin-bottom: 2em;
 }
 
-.btn-login {
-    background-image: linear-gradient(to bottom, red, #f06d06);
-    border: 1px solid red;
-    color: #000;
+.btn {
+    background-color: #222;
+    border: 1px solid #222;
+    height: 50px;
+    width: 170px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    font-size: 20px;
+    text-decoration: none;
 }
 
-.btn-shuffle {
-    background-image: linear-gradient(to bottom, red, #f06d06);
-    border: 1px solid red;
-    color: #000;
-    margin-top: 2em;
+.btn-gradient {
+    background-color: #ff1b43;
+    background-image: linear-gradient(to bottom, #ff1b43, #f06d06);
+    border: 1px solid #ff1b43;
+}
+
+.btn-gradient:hover {
+    color: #222;
+    cursor: pointer;
+}
+
+.btn-gradient:hover > svg {
+    fill: #222;
+}
+
+.btn-login, .btn-shuffle {
+    margin: 0 auto;
 }
 
 .btn-shuffle .shuffle-text {
     display: block;
-    font-weight: bold;
-    margin-left: 8px;
-    margin-top: 3px;
-    float: right;
 }
 
-.btn-shuffle img {
-    width: 25px;
-    height: auto;
+.btn-login {
+    width: 220px;
+    height: 20px;
+    margin-top: 2em;
 }
 
 #oauth-template {
@@ -73,44 +89,46 @@ body {
     background-color: transparent;
 }
 
-iframe {
-    /*border: 3px dashed rgb(240 109 6 / 50%);*/
-}
-
-#player {
-    margin-top: 1em;
+#player h4 {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 2em;
 }
 
 #player h3 {
     text-align: center;
     margin: 0 auto;
+    font-size: 2.5em;
+  background: -webkit-linear-gradient(#ff1b43, #f06d06);
+    background-clip: border-box;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1em;
 }
 
-#player h2 {
-    text-align: center;
+#playlistsContainer {
     margin: 0 auto;
+    overflow: auto;
+    padding-bottom: 1em;
+    width: 100%;
 }
 
-#playlists {
-    border-top: 2px dashed #222;
-    border-bottom: 2px dashed #222;
-    margin-left: 30px;
-}
-
-#playlists ul {
+#playlistsContainer ul {
     list-style-type: none;
 }
 
-#playlists ul li {
-    display: inline;
-    margin-right: .5em;
+#playlistsContainer ul li {
+    margin-right: 1.5em;
     float: left;
-    width: 250px;
     text-align: left;
+    display: flex;
 }
 
-#playlists ul li span {
-    margin-right: .5em;
+#playlistsContainer ul li span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 190px;
+    white-space: nowrap;
 }
 
 .playlist-section {
@@ -137,6 +155,24 @@ iframe {
 .playlist-section::-webkit-scrollbar-thumb { height: 50px; background-color: #666; border-radius: 3px;}
 .playlist-section::-webkit-scrollbar-corner { background-color: #646464;}
 .playlist-section::-webkit-resizer { background-color: #666;}
+
+
+.playlist-checkbox, input[type="radio"] {
+    accent-color: #34495e;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+.owned-playlist {
+    margin-left: 5px;
+}
+
+.other-playlist {
+    color: #ff1b43; 
+    margin-left: 5px;
+}
 
 /*li > input[type="checkbox"] {
     display: none;
@@ -168,4 +204,136 @@ li > input[type="checkbox"]:checked + * {
 
 .other-playlist {
     color: hotpink;
+}
+
+.gradient-border {
+    border-top: 10px solid;
+    border-bottom: 10px solid;
+    border-image: linear-gradient(#ff1b43, #f06d06) 30;
+}
+
+.options-group {
+    margin-top: 3em;
+}
+
+.options-label {
+    color: #999595;
+    margin-bottom: 0px;
+}
+
+.options-checkbox {
+    display: flex; 
+    justify-content: space-between;
+}
+
+.options-checkbox p {
+    font-weight: bold;
+}
+
+.options-checkbox label {
+    display: flex;
+}
+
+ /* The switch - the box around the slider */
+ .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    margin-top: 5px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  /* The slider */
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 4px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-image: linear-gradient(to bottom, #ff1b43, #f06d06);
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #ff1b43;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  } 
+
+  .hidden {
+    display: none;
+  }
+
+   #loggedin {
+    width: 80%;
+    margin: 0 auto; 
+    display: flex; 
+    justify-content: center; 
+    flex-direction: column; 
+    margin-top: 3em;
+
+    @media only screen and (max-width: 600px) {
+        width: 90%;
+    }
+
+    @media only screen and (min-width: 992px) {
+        width: 50%;
+    }
+
+  }
+
+#settingsContainer {
+    width: 80%;
+    margin: 0 auto; 
+    display: flex; 
+    justify-content: center; 
+    flex-direction: column; 
+
+    @media only screen and (max-width: 600px) {
+        width: 90%;
+    }
+
+    @media only screen and (min-width: 992px) {
+        width: 60%;
+    }
+
 }

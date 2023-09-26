@@ -1,21 +1,14 @@
 (function() {
-    var playerSource = document.getElementById('player-template').innerHTML,
-        playerTemplate = Handlebars.compile(playerSource),
-        playerPlaceholder = document.getElementById('player');
-    
-    var playlistSource = document.getElementById('playlist-template').innerHTML,
-        playlistTemplate = Handlebars.compile(playlistSource),
-        playlistPlaceholder = document.getElementById('playlists');
+    let params = getHashParams();
 
-    var params = getHashParams();
-
-    var access_token = params.access_token,
+    let access_token = params.access_token,
         error = params.error;
 
-    var user_id = '';
+    let user_id = '';
 
-    var include_all_playlists = 0;
-    var include_liked_tracks = 0;
+    let include_all_playlists = false;
+    let include_liked_tracks = true;
+    let choose_playlists = false;
 
     /*
       Pull a list of all my playlists
@@ -53,7 +46,23 @@
 
         }
 
-        playlistPlaceholder.innerHTML = playlistTemplate(all_playlists);
+        let playlistsList = document.getElementById('playlists');
+        let playlistsHTML = "";
+
+        for(let j = 0; j < all_playlists.length; j++) {
+
+            let playlist = all_playlists[j];
+            let tracks = playlist?.tracks;
+            let owned_playlist = playlist?.owned_playlist;
+
+            let playlistNameClass = owned_playlist ? 'owned-playlist' : 'other-playlist';
+            let checkBoxHTML = `<li>
+            <input type="checkbox" class="playlist-checkbox" name="playlist[]" value="${tracks?.href}" checked/><span class="${playlistNameClass}">${playlist?.name}</span></li>`;
+
+            playlistsHTML += checkBoxHTML;
+        }
+
+        playlistsList.innerHTML = playlistsHTML;
 
         // Add ability to select/deselect playlists
         $('input[name=select_all]').off('change').on('change', function() {
@@ -89,7 +98,18 @@
         contentType: "application/json",
         success: function(response) {
           
-          playerPlaceholder.innerHTML = playerTemplate(response.item);
+            let track = response?.item;
+            let artists = track?.artists;
+            let artistName = document.getElementById('artistName');
+            let songName = document.getElementById('songName');
+            let artistNameDisplay = "";
+
+            for(let i = 0; i < artists.length; i++) {
+                artistNameDisplay += artists[i]?.name;
+            }
+
+            artistName.innerHTML = artistNameDisplay;
+            songName.innerHTML = track?.name;
 
         },
         error: function(xhr, status, error) {
@@ -155,7 +175,7 @@
         error: function(xhr, status, error) {
           console.log('error: ', xhr.responseText);
         }
-    });
+        });
     
     }
 
@@ -166,17 +186,53 @@
 
         getUserInfo(access_token);
 
-        $('input[name=include_all_playlists]').off('change').on('change', function() {
-          include_all_playlists = $('input[name=include_all_playlists]:checked').val();
+        // Toggle "My playlists only" checkbox
+        let my_playlists_only_checkbox = document.getElementById('myPlaylistsOnlyCheckbox');
 
-          let owned_only = include_all_playlists == 0 ? true : false;
+        $('input[name=my_playlists_only]').off('change').on('change', function() {
 
-          // Refresh list of playlists
-          getPlaylists(access_token, user_id, owned_only);
+            my_playlists_only = my_playlists_only_checkbox.checked;
+
+            let my_playlists_only_value = document.getElementById('myPlaylistsOnlyValue');
+            if(my_playlists_only) {
+                my_playlists_only_value.innerHTML = "ON";
+            } else {
+                my_playlists_only_value.innerHTML = "OFF";
+            }
+
+            // Refresh list of playlists
+            getPlaylists(access_token, user_id, my_playlists_only);
         });
 
+        // Toggle "Include like tracks" checkbox
         $('input[name=include_liked_tracks]').off('change').on('change', function() {
           include_liked_tracks = $('input[name=include_liked_tracks]').is(':checked');
+
+          let include_liked_tracks_value = document.getElementById('includeLikedTracksValue');
+          if(include_liked_tracks) {
+            include_liked_tracks_value.innerHTML = "ON";
+          } else {
+            include_liked_tracks_value.innerHTML = "OFF";
+          }
+
+        });
+
+        // Toggle "Choose playlists" checkbox
+        $('input[name=choose_playlists]').off('change').on('change', function() {
+            choose_playlists = $('input[name=choose_playlists]').is(':checked');
+
+            let choose_playlists_value = document.getElementById('choosePlaylistsValue');
+            let playlists_container = document.getElementById('playlistsContainer');
+
+            if(choose_playlists) {
+                choose_playlists_value.innerHTML = "ON";
+                playlists_container.style.display = "block";
+
+            } else {
+                choose_playlists_value.innerHTML = "OFF";
+                playlists_container.style.display = "none";
+            }
+  
         });
       
       } else {
