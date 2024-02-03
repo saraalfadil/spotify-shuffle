@@ -113,14 +113,8 @@
 		let artists = track?.artists;
 		let artistName = document.getElementById('artistName');
 		let songName = document.getElementById('songName');
-		let artistNameDisplay = "";
-
-		for(let i = 0; i < artists.length; i++) {
-			artistNameDisplay += artists[i]?.name;
-			if(i != artists.length -1) {
-				artistNameDisplay += ', ';
-			}
-		}
+		let artistNames = artists.map(artist => artist?.name);
+		let artistNameDisplay = artistNames.join(", ");
 
 		artistName.innerHTML = artistNameDisplay;
 		songName.innerHTML = track?.name;
