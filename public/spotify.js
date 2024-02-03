@@ -1,87 +1,87 @@
 (function() {
-    let params = getHashParams();
+	let params = getHashParams();
 
-    let access_token = params.access_token,
-        error = params.error;
+	let access_token = params.access_token,
+		error = params.error;
 
-    let user_id = '';
+	let user_id = '';
 
-    let include_all_playlists = false;
-    let include_liked_tracks = true;
-    let choose_playlists = false;
+	let include_all_playlists = false;
+	let include_liked_tracks = true;
+	let choose_playlists = false;
 
-    /*
-      Pull a list of all my playlists
-    */
-    const getPlaylists = function(access_token, user_id, owned_only) {
+  /*
+    Pull a list of all my playlists
+  */
+  const getPlaylists = function(access_token, user_id, owned_only) {
 
-      $.ajax({
-        url: '/playlists',
-        data: {
-          'access_token': access_token,
-          'user_id': user_id
-        }
-      }).done(function(data) {
-        
-        let all_playlists = [];
-        let playlists = data.playlists;
+    $.ajax({
+      url: '/playlists',
+      data: {
+        'access_token': access_token,
+        'user_id': user_id
+      }
+    }).done(function(data) {
+      
+      let all_playlists = [];
+      let playlists = data.playlists;
 
-        for(let i = 0; i < playlists.length; i++) {
+      for(let i = 0; i < playlists.length; i++) {
 
-          var playlist = playlists[i];
-          let owner = playlist.owner;
-          let owned_playlist = owner && owner.id == user_id;
-          playlist.owned_playlist = owned_playlist;
+        var playlist = playlists[i];
+        let owner = playlist.owner;
+        let owned_playlist = owner && owner.id == user_id;
+        playlist.owned_playlist = owned_playlist;
 
-          if(owned_only) {
-            
-            if(owned_playlist)
-              all_playlists.push(playlist);
-
-          } else {
-
+        if(owned_only) {
+          
+          if(owned_playlist)
             all_playlists.push(playlist);
 
-          }
+        } else {
+
+          all_playlists.push(playlist);
 
         }
 
-        let playlistsList = document.getElementById('playlists');
-        let playlistsHTML = "";
+      }
 
-        for(let j = 0; j < all_playlists.length; j++) {
+      let playlistsList = document.getElementById('playlists');
+      let playlistsHTML = "";
 
-            let playlist = all_playlists[j];
-            let tracks = playlist?.tracks;
-            let owned_playlist = playlist?.owned_playlist;
+      for(let j = 0; j < all_playlists.length; j++) {
 
-            let playlistNameClass = owned_playlist ? 'owned-playlist' : 'other-playlist';
-            let checkBoxHTML = `<li>
-            <input type="checkbox" class="playlist-checkbox" name="playlist[]" value="${tracks?.href}" checked/><span class="${playlistNameClass}">${playlist?.name}</span></li>`;
+          let playlist = all_playlists[j];
+          let tracks = playlist?.tracks;
+          let owned_playlist = playlist?.owned_playlist;
 
-            playlistsHTML += checkBoxHTML;
+          let playlistNameClass = owned_playlist ? 'owned-playlist' : 'other-playlist';
+          let checkBoxHTML = `<li>
+          <input type="checkbox" class="playlist-checkbox" name="playlist[]" value="${tracks?.href}" checked/><span class="${playlistNameClass}">${playlist?.name}</span></li>`;
+
+          playlistsHTML += checkBoxHTML;
+      }
+
+      playlistsList.innerHTML = playlistsHTML;
+
+      // Add ability to select/deselect playlists
+      $('input[name=select_all]').off('change').on('change', function() {
+        let select_all = $('input[name=select_all]').is(':checked');
+
+        if(select_all) {
+          document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+          });
+        } else {
+          document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+          });
         }
-
-        playlistsList.innerHTML = playlistsHTML;
-
-        // Add ability to select/deselect playlists
-        $('input[name=select_all]').off('change').on('change', function() {
-          let select_all = $('input[name=select_all]').is(':checked');
-
-          if(select_all) {
-            document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
-              checkbox.checked = true;
-            });
-          } else {
-            document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
-              checkbox.checked = false;
-            });
-          }
-        });
-
       });
 
-    }
+    });
+
+  }
     
     /*
       Get information about the currently playing track
@@ -97,22 +97,8 @@
         dataType: 'json',
         contentType: "application/json",
         success: function(response) {
-          
-            let track = response?.item;
-            let artists = track?.artists;
-            let artistName = document.getElementById('artistName');
-            let songName = document.getElementById('songName');
-            let artistNameDisplay = "";
-
-            for(let i = 0; i < artists.length; i++) {
-                artistNameDisplay += artists[i]?.name;
-                if(i != artists.length -1) {
-                  artistNameDisplay += ', ';
-                }
-            }
-
-            artistName.innerHTML = artistNameDisplay;
-            songName.innerHTML = track?.name;
+        
+            showNowPlaying(response?.item);
 
         },
         error: function(xhr, status, error) {
@@ -122,14 +108,33 @@
     
     }
 
+	const showNowPlaying = function(track) {
+
+		let artists = track?.artists;
+		let artistName = document.getElementById('artistName');
+		let songName = document.getElementById('songName');
+		let artistNameDisplay = "";
+
+		for(let i = 0; i < artists.length; i++) {
+			artistNameDisplay += artists[i]?.name;
+			if(i != artists.length -1) {
+				artistNameDisplay += ', ';
+			}
+		}
+
+		artistName.innerHTML = artistNameDisplay;
+		songName.innerHTML = track?.name;
+		
+	}
+
     /*
       Initiate playback on the active user device
     */
     const playTracks = function(tracks, user_id) {
 
-      let jsonData = JSON.stringify({
-        uris: tracks
-      });
+	let jsonData = JSON.stringify({
+		uris: tracks
+	});
 
       $.ajax({
           url: 'https://api.spotify.com/v1/me/player/play',
@@ -185,47 +190,90 @@
     }
 
     const toggleMyPlaylistsOnly = function() {
-      my_playlists_only = this.checked;
+		my_playlists_only = this.checked;
 
-      let my_playlists_only_value = document.getElementById('myPlaylistsOnlyValue');
-      if(my_playlists_only) {
-          my_playlists_only_value.innerHTML = "ON";
-      } else {
-          my_playlists_only_value.innerHTML = "OFF";
-      }
+		let my_playlists_only_value = document.getElementById('myPlaylistsOnlyValue');
+		if(my_playlists_only) {
+			my_playlists_only_value.innerHTML = "ON";
+		} else {
+			my_playlists_only_value.innerHTML = "OFF";
+		}
 
-      // Refresh list of playlists
-      getPlaylists(access_token, user_id, my_playlists_only);
+		// Refresh list of playlists
+		getPlaylists(access_token, user_id, my_playlists_only);
     }
 
 
     const toggleIncludeLikedTracks = function() {
-      include_liked_tracks = this.checked;
+		include_liked_tracks = this.checked;
 
-      let include_liked_tracks_value = document.getElementById('includeLikedTracksValue');
-      if(include_liked_tracks) {
-        include_liked_tracks_value.innerHTML = "ON";
-      } else {
-        include_liked_tracks_value.innerHTML = "OFF";
-      }
+		let include_liked_tracks_value = document.getElementById('includeLikedTracksValue');
+		if(include_liked_tracks) {
+			include_liked_tracks_value.innerHTML = "ON";
+		} else {
+			include_liked_tracks_value.innerHTML = "OFF";
+		}
     };
 
     const toggleChoosePlaylists = function() {
-      choose_playlists = this.checked;
+		choose_playlists = this.checked;
 
-      let choose_playlists_value = document.getElementById('choosePlaylistsValue');
-      let playlists_container = document.getElementById('playlistsContainer');
+		let choose_playlists_value = document.getElementById('choosePlaylistsValue');
+		let playlists_container = document.getElementById('playlistsContainer');
 
-      if(choose_playlists) {
-          choose_playlists_value.innerHTML = "ON";
-          playlists_container.style.display = "block";
+		if(choose_playlists) {
+			choose_playlists_value.innerHTML = "ON";
+			playlists_container.style.display = "block";
 
-      } else {
-          choose_playlists_value.innerHTML = "OFF";
-          playlists_container.style.display = "none";
-      }
+		} else {
+			choose_playlists_value.innerHTML = "OFF";
+			playlists_container.style.display = "none";
+		}
     }
 
+  /*
+    Retrieve a list of shuffled tracks
+  */
+    const shuffle = function() {
+      $('.spinner-icon').removeClass('hidden');
+      $('.shuffle-icon').addClass('hidden');
+      document.getElementById('shuffleText').innerText = 'Shuffling...';
+
+      // Get iterable list of selected checkboxes elements
+      let playlist_items = Array.from(document.getElementsByName('playlist[]'));
+      let selected_playlists = playlist_items.filter((item) => item.checked);
+      let filter_playlists = selected_playlists.map((item) => item.value);
+
+      $.ajax({
+        url: '/shuffle',
+        data: {
+          'access_token': access_token,
+          'user_id': user_id,
+          'include_all_playlists': include_all_playlists,
+          'include_liked_tracks': include_liked_tracks,
+          //'filter_playlists': filter_playlists
+        }
+      }).done(function(data) {
+        
+        if(data.all_tracks) {
+          playTracks(data.all_tracks, user_id);
+        }
+
+      });
+      
+    }
+
+    // Enable "Shuffle" button
+    document.getElementById('shuffle').addEventListener('click', shuffle, false);
+
+    // Toggle "My playlists only" checkbox
+    document.getElementById('myPlaylistsOnlyCheckbox').addEventListener('change', toggleMyPlaylistsOnly, false);
+
+    // Toggle "Include like tracks" checkbox
+    document.getElementById('includeLikedTracksCheckbox').addEventListener('change', toggleIncludeLikedTracks, false);
+
+    // Toggle "Choose playlists" checkbox
+    document.getElementById('choosePlaylistsCheckbox').addEventListener('change', toggleChoosePlaylists, false);
 
     if (error) {
       alert('There was an error authenticating');
@@ -234,57 +282,9 @@
 
         getUserInfo(access_token);
 
-        // Toggle "My playlists only" checkbox
-        let myPlaylistsOnlyCheckbox = document.getElementById('myPlaylistsOnlyCheckbox');
-        myPlaylistsOnlyCheckbox.addEventListener('change', toggleMyPlaylistsOnly, false);
-
-        // Toggle "Include like tracks" checkbox
-        let includeLikedTracksCheckbox = document.getElementById('includeLikedTracksCheckbox');
-        includeLikedTracksCheckbox.addEventListener('change', toggleIncludeLikedTracks, false);
-
-        // Toggle "Choose playlists" checkbox
-        let choosePlaylistsCheckbox = document.getElementById('choosePlaylistsCheckbox');
-        choosePlaylistsCheckbox.addEventListener('change', toggleChoosePlaylists, false);
-
       } else {
           $('#login').show();
           $('#loggedin').hide();
       }
-  
-
-      /*
-        Retrieve a list of shuffled tracks
-      */
-      const shuffle = function() {
-        $('.spinner-icon').removeClass('hidden');
-        $('.shuffle-icon').addClass('hidden');
-        document.getElementById('shuffleText').innerText = 'Shuffling...';
-
-        // Get iterable list of selected checkboxes elements
-        let playlist_items = Array.from(document.getElementsByName('playlist[]'));
-        let selected_playlists = playlist_items.filter((item) => item.checked);
-        let filter_playlists = selected_playlists.map((item) => item.value);
-
-        $.ajax({
-          url: '/shuffle',
-          data: {
-            'access_token': access_token,
-            'user_id': user_id,
-            'include_all_playlists': include_all_playlists,
-            'include_liked_tracks': include_liked_tracks,
-            //'filter_playlists': filter_playlists
-          }
-        }).done(function(data) {
-          
-          if(data.all_tracks) {
-            playTracks(data.all_tracks, user_id);
-          }
-
-        });
-        
-      }
-
-      document.getElementById('shuffle').addEventListener('click', shuffle, false);
-
     }
 })();
