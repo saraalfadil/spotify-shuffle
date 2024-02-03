@@ -1,97 +1,86 @@
 (function() {
 	let params = getHashParams();
 
-	let access_token = params.access_token,
-		error = params.error;
+	let accessToken = params.access_token;
+	let error = params.error;
 
-	let user_id = '';
+	let userId = '';
 
-	let include_all_playlists = false;
-	let include_liked_tracks = true;
-	let choose_playlists = false;
+	let includeAllPlaylists = false;
+	let includeLikedTracks = true;
 
-  /*
-    Pull a list of all my playlists
-  */
-  const getPlaylists = function(access_token, user_id, owned_only) {
+    /*
+        Pull a list of all my playlists
+    */
+    const getPlaylists = function(accessToken, userId, ownedOnly) {
 
-    $.ajax({
-      url: '/playlists',
-      data: {
-        'access_token': access_token,
-        'user_id': user_id
-      }
-    }).done(function(data) {
-      
-      let all_playlists = [];
-      let playlists = data.playlists;
+        $.ajax({
+            url: '/playlists',
+            data: {
+                'access_token': accessToken,
+                'user_id': userId
+            }
+            }).done(function(data) {
+            
+            let allPlaylists = data.playlists;
+            let playlists = filterPlaylists(allPlaylists, ownedOnly);
 
-      for(let i = 0; i < playlists.length; i++) {
+            displayPlaylistSelection(playlists);
 
-        var playlist = playlists[i];
-        let owner = playlist.owner;
-        let owned_playlist = owner && owner.id == user_id;
-        playlist.owned_playlist = owned_playlist;
+        });
 
-        if(owned_only) {
-          
-          if(owned_playlist)
-            all_playlists.push(playlist);
+    }
 
-        } else {
+    // Filter playlists based on "My playlists only" selection
+    const filterPlaylists = function(allPlaylists, ownedOnly) {
+        let playlists = allPlaylists.filter(playlist => {
 
-          all_playlists.push(playlist);
+            let owner = playlist.owner;
+            let ownedPlaylist = owner && owner.id == userId;
 
-        }
+            if(ownedPlaylist) 
+                return playlist;
 
-      }
+        });
 
-      let playlistsList = document.getElementById('playlists');
-      let playlistsHTML = "";
+        if (ownedOnly)
+            return playlists;
+        else 
+            return allPlaylists;
+    }
 
-      for(let j = 0; j < all_playlists.length; j++) {
+    const displayPlaylistSelection = function(allPlaylists) {
 
-          let playlist = all_playlists[j];
-          let tracks = playlist?.tracks;
-          let owned_playlist = playlist?.owned_playlist;
+        let playlistsList = document.getElementById('playlists');
+        let playlistsHTML = "";
 
-          let playlistNameClass = owned_playlist ? 'owned-playlist' : 'other-playlist';
-          let checkBoxHTML = `<li>
-          <input type="checkbox" class="playlist-checkbox" name="playlist[]" value="${tracks?.href}" checked/><span class="${playlistNameClass}">${playlist?.name}</span></li>`;
+        allPlaylists.forEach(playlist => {
 
-          playlistsHTML += checkBoxHTML;
-      }
+            let tracks = playlist?.tracks;
+            let owner = playlist.owner;
+            let ownedPlaylist = owner && owner.id == userId;
 
-      playlistsList.innerHTML = playlistsHTML;
+            let playlistNameClass = ownedPlaylist ? 'owned-playlist' : 'other-playlist';
+            let checkBoxHTML = `<li>
+            <input type="checkbox" class="playlist-checkbox" name="playlist[]" value="${tracks?.href}" checked/><span class="${playlistNameClass}">${playlist?.name}</span></li>`;
 
-      // Add ability to select/deselect playlists
-      $('input[name=select_all]').off('change').on('change', function() {
-        let select_all = $('input[name=select_all]').is(':checked');
+            playlistsHTML += checkBoxHTML;
 
-        if(select_all) {
-          document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
-            checkbox.checked = true;
-          });
-        } else {
-          document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
-            checkbox.checked = false;
-          });
-        }
-      });
+        });
 
-    });
-
-  }
+        playlistsList.innerHTML = playlistsHTML;
+        
+    }
     
     /*
       Get information about the currently playing track
     */
-    const getPlayerInfo = function(access_token) {
+    const getPlayerInfo = function(accessToken) {
 
       $.ajax({
         url: 'https://api.spotify.com/v1/me/player',
         headers: {
-          'Authorization': 'Bearer ' + access_token
+          'Authorization': 'Bearer ' + accessToken
         },
         type: 'GET',
         dataType: 'json',
@@ -110,121 +99,127 @@
 
 	const showNowPlaying = function(track) {
 
-		let artists = track?.artists;
-		let artistName = document.getElementById('artistName');
-		let songName = document.getElementById('songName');
-		let artistNames = artists.map(artist => artist?.name);
-		let artistNameDisplay = artistNames.join(", ");
+        let artistNames = track?.artists.map(artist => artist?.name);
+        let artistNameDisplay = artistNames.join(", ");
 
-		artistName.innerHTML = artistNameDisplay;
-		songName.innerHTML = track?.name;
+        let artistName = document.getElementById('artistName');
+        let songName = document.getElementById('songName');
+        artistName.innerHTML = artistNameDisplay;
+        songName.innerHTML = track?.name;
 		
 	}
 
     /*
       Initiate playback on the active user device
     */
-    const playTracks = function(tracks, user_id) {
-
-	let jsonData = JSON.stringify({
-		uris: tracks
-	});
+    const playTracks = function(tracks, userId) {
 
       $.ajax({
-          url: 'https://api.spotify.com/v1/me/player/play',
-          headers: {
-            'Authorization': 'Bearer ' + access_token
-          },
-          type: 'PUT',
-          data: jsonData,
-          dataType: 'json',
-          contentType: "application/json",
-          success: function(response) {
-            
-            getPlayerInfo(access_token, user_id);
+        url: 'https://api.spotify.com/v1/me/player/play',
+        headers: {
+            'Authorization': 'Bearer ' + accessToken
+        },
+        type: 'PUT',
+        data: JSON.stringify({
+            uris: tracks
+        }),
+        dataType: 'json',
+        contentType: "application/json",
+        success: function(response) {
+
+            getPlayerInfo(accessToken, userId);
 
             $('.spinner-icon').addClass('hidden');
             $('.shuffle-icon').removeClass('hidden');
-            document.getElementById('shuffleText').innerText = 'Shuffle';
-            
-          },
-          error: function(xhr, status, error) {
+                document.getElementById('shuffleText').innerText = 'Shuffle';
+
+        },
+        error: function(xhr, status, error) {
             console.log('error: ', xhr.responseText);
-          }
+        }
       });
     
     }
 
-    const getUserInfo = function(access_token) {
+    const getUserInfo = function(accessToken) {
 
       $.ajax({
         url: 'https://api.spotify.com/v1/me',
         headers: {
-          'Authorization': 'Bearer ' + access_token
+          'Authorization': 'Bearer ' + accessToken
         },
         success: function(response) {
-          user_id = response.id;
+            userId = response.id;
 
-          // Get a list of all my playlists
-          getPlaylists(access_token, user_id, true);
+            // Get a list of all my playlists
+            getPlaylists(accessToken, userId, true);
 
-          // Find out what is playing right now
-          getPlayerInfo(access_token, user_id);
-          
-          // Display authenticated page
-          $('#login').hide();
-          $('#loggedin').show();
+            // Find out what is playing right now
+            getPlayerInfo(accessToken, userId);
+            
+            // Display authenticated page
+            $('#login').hide();
+            $('#loggedin').show();
 
         },
         error: function(xhr, status, error) {
-          console.log('error: ', xhr.responseText);
+            console.log('error: ', xhr.responseText);
         }
         });
     
     }
 
     const toggleMyPlaylistsOnly = function() {
-		my_playlists_only = this.checked;
+		let myPlaylistsOnly = this.checked;
+		let myPlaylistsOnlyValue = document.getElementById('myPlaylistsOnlyValue');
 
-		let my_playlists_only_value = document.getElementById('myPlaylistsOnlyValue');
-		if(my_playlists_only) {
-			my_playlists_only_value.innerHTML = "ON";
+		if(myPlaylistsOnly) {
+			myPlaylistsOnlyValue.innerHTML = "ON";
 		} else {
-			my_playlists_only_value.innerHTML = "OFF";
+			myPlaylistsOnlyValue.innerHTML = "OFF";
 		}
 
 		// Refresh list of playlists
-		getPlaylists(access_token, user_id, my_playlists_only);
+		getPlaylists(accessToken, userId, myPlaylistsOnly);
     }
 
 
     const toggleIncludeLikedTracks = function() {
-		include_liked_tracks = this.checked;
+		let includeLikedTracksValue = document.getElementById('includeLikedTracksValue');
 
-		let include_liked_tracks_value = document.getElementById('includeLikedTracksValue');
-		if(include_liked_tracks) {
-			include_liked_tracks_value.innerHTML = "ON";
+		if(this.checked) {
+			includeLikedTracksValue.innerHTML = "ON";
 		} else {
-			include_liked_tracks_value.innerHTML = "OFF";
+			includeLikedTracksValue.innerHTML = "OFF";
 		}
     };
 
     const toggleChoosePlaylists = function() {
-		choose_playlists = this.checked;
+		let choosePlaylistsValue = document.getElementById('choosePlaylistsValue');
+		let playlistsContainer = document.getElementById('playlistsContainer');
 
-		let choose_playlists_value = document.getElementById('choosePlaylistsValue');
-		let playlists_container = document.getElementById('playlistsContainer');
-
-		if(choose_playlists) {
-			choose_playlists_value.innerHTML = "ON";
-			playlists_container.style.display = "block";
+		if(this.checked) {
+			choosePlaylistsValue.innerHTML = "ON";
+			playlistsContainer.style.display = "block";
 
 		} else {
-			choose_playlists_value.innerHTML = "OFF";
-			playlists_container.style.display = "none";
+			choosePlaylistsValue.innerHTML = "OFF";
+			playlistsContainer.style.display = "none";
 		}
     }
 
+    // Add ability to select/deselect playlists
+    const toggleSelectAllPlaylists = function() {
+        if(this.checked) {
+          document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
+            checkbox.checked = true;
+          });
+        } else {
+          document.querySelectorAll('.playlist-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+          });
+        }
+    }
   /*
     Retrieve a list of shuffled tracks
   */
@@ -234,28 +229,30 @@
       document.getElementById('shuffleText').innerText = 'Shuffling...';
 
       // Get iterable list of selected checkboxes elements
-      let playlist_items = Array.from(document.getElementsByName('playlist[]'));
-      let selected_playlists = playlist_items.filter((item) => item.checked);
-      let filter_playlists = selected_playlists.map((item) => item.value);
+      let playlistItems = Array.from(document.getElementsByName('playlist[]'));
+      let selectedPlaylists = playlistItems.filter((item) => item.checked);
+      let filterPlaylists = selectedPlaylists.map((item) => item.value);
 
       $.ajax({
         url: '/shuffle',
         data: {
-          'access_token': access_token,
-          'user_id': user_id,
-          'include_all_playlists': include_all_playlists,
-          'include_liked_tracks': include_liked_tracks,
+          'access_token': accessToken,
+          'user_id': userId,
+          'include_all_playlists': includeAllPlaylists,
+          'include_liked_tracks': includeLikedTracks,
           //'filter_playlists': filter_playlists
         }
       }).done(function(data) {
         
         if(data.all_tracks) {
-          playTracks(data.all_tracks, user_id);
+          playTracks(data.all_tracks, userId);
         }
 
       });
       
     }
+
+    document.getElementById('selectAllPlaylists').addEventListener('click', toggleSelectAllPlaylists, false);
 
     // Enable "Shuffle" button
     document.getElementById('shuffle').addEventListener('click', shuffle, false);
@@ -272,9 +269,9 @@
     if (error) {
       alert('There was an error authenticating');
     } else {
-      if (access_token) {
+      if (accessToken) {
 
-        getUserInfo(access_token);
+        getUserInfo(accessToken);
 
       } else {
           $('#login').show();
