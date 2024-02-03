@@ -12,23 +12,111 @@
     /*
         Pull a list of all my playlists
     */
-    const getPlaylists = function(accessToken, userId, ownedOnly) {
+    const getPlaylists = async function(accessToken, userId, ownedOnly) {
 
-        $.ajax({
-            url: '/playlists',
-            data: {
-                'access_token': accessToken,
-                'user_id': userId
+        let queryParams = new URLSearchParams({
+            'access_token': accessToken,
+            'user_id': userId
+        });
+
+        await fetch('/playlists/?' + queryParams, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             }
-            }).done(function(data) {
-            
+        })
+        .then((response) => response.json())
+        .then((data) => {
             let allPlaylists = data.playlists;
             let playlists = filterPlaylists(allPlaylists, ownedOnly);
 
             displayPlaylistSelection(playlists);
-
+        })
+        .catch((error) => {
+            console.error('Error:', error);
         });
 
+    }
+
+    /*
+      Get information about the currently playing track
+    */
+    const getPlayerInfo = async function(accessToken) {
+
+        await fetch('https://api.spotify.com/v1/me/player/', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            showNowPlaying(data?.item);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    
+    }
+
+    
+    /*
+      Initiate playback on the active user device
+    */
+    const playTracks = async function(tracks, userId) {
+
+        await fetch('https://api.spotify.com/v1/me/player/play', {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                uris: tracks
+            }),
+        })
+        .then((response) => response.json())
+        .then((data) => {})
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
+        getPlayerInfo(accessToken, userId);
+
+        $('.spinner-icon').addClass('hidden');
+        $('.shuffle-icon').removeClass('hidden');
+        document.getElementById('shuffleText').innerText = 'Shuffle';
+      
+    }
+  
+    const getUserInfo = async function(accessToken) {
+
+        await fetch('https://api.spotify.com/v1/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            }
+        })
+        .then((response) => response.json())
+        .then((data) => {
+
+            userId = data.id;
+
+            // Get a list of all my playlists
+            getPlaylists(accessToken, userId, true);
+
+            // Find out what is playing right now
+            getPlayerInfo(accessToken, userId);
+            
+            // Display authenticated page
+            $('#login').hide();
+            $('#loggedin').show();
+
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    
     }
 
     // Filter playlists based on "My playlists only" selection
@@ -71,31 +159,6 @@
         playlistsList.innerHTML = playlistsHTML;
         
     }
-    
-    /*
-      Get information about the currently playing track
-    */
-    const getPlayerInfo = function(accessToken) {
-
-      $.ajax({
-        url: 'https://api.spotify.com/v1/me/player',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
-        },
-        type: 'GET',
-        dataType: 'json',
-        contentType: "application/json",
-        success: function(response) {
-        
-            showNowPlaying(response?.item);
-
-        },
-        error: function(xhr, status, error) {
-          console.log('error: ', xhr.responseText);
-        }
-      });
-    
-    }
 
 	const showNowPlaying = function(track) {
 
@@ -108,66 +171,6 @@
         songName.innerHTML = track?.name;
 		
 	}
-
-    /*
-      Initiate playback on the active user device
-    */
-    const playTracks = function(tracks, userId) {
-
-      $.ajax({
-        url: 'https://api.spotify.com/v1/me/player/play',
-        headers: {
-            'Authorization': 'Bearer ' + accessToken
-        },
-        type: 'PUT',
-        data: JSON.stringify({
-            uris: tracks
-        }),
-        dataType: 'json',
-        contentType: "application/json",
-        success: function(response) {
-
-            getPlayerInfo(accessToken, userId);
-
-            $('.spinner-icon').addClass('hidden');
-            $('.shuffle-icon').removeClass('hidden');
-                document.getElementById('shuffleText').innerText = 'Shuffle';
-
-        },
-        error: function(xhr, status, error) {
-            console.log('error: ', xhr.responseText);
-        }
-      });
-    
-    }
-
-    const getUserInfo = function(accessToken) {
-
-      $.ajax({
-        url: 'https://api.spotify.com/v1/me',
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
-        },
-        success: function(response) {
-            userId = response.id;
-
-            // Get a list of all my playlists
-            getPlaylists(accessToken, userId, true);
-
-            // Find out what is playing right now
-            getPlayerInfo(accessToken, userId);
-            
-            // Display authenticated page
-            $('#login').hide();
-            $('#loggedin').show();
-
-        },
-        error: function(xhr, status, error) {
-            console.log('error: ', xhr.responseText);
-        }
-        });
-    
-    }
 
     const toggleMyPlaylistsOnly = function() {
 		let myPlaylistsOnly = this.checked;
