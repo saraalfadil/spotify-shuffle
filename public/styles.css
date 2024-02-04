@@ -70,7 +70,7 @@ body {
     background-color: transparent;
 }
 
-#login, #loggedin {
+#login, #loggedin, #loading {
     display: none;
 }
 
@@ -104,11 +104,11 @@ body {
     text-align: center;
     margin: 0 auto;
     font-size: 2.5em;
-  background: -webkit-linear-gradient(#ff1b43, #f06d06);
+    background: -webkit-linear-gradient(#ff1b43, #f06d06);
     background-clip: border-box;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 1em;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1em;
 }
 
 #playlistsContainer {
@@ -239,24 +239,24 @@ li > input[type="checkbox"]:checked + * {
     display: flex;
 }
 
- /* The switch - the box around the slider */
- .switch {
+/* The switch - the box around the slider */
+.switch {
     position: relative;
     display: inline-block;
     width: 60px;
     height: 34px;
     margin-top: 5px;
-  }
+}
   
-  /* Hide default HTML checkbox */
-  .switch input {
+/* Hide default HTML checkbox */
+.switch input {
     opacity: 0;
     width: 0;
     height: 0;
-  }
+}
   
-  /* The slider */
-  .slider {
+/* The slider */
+.slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -267,9 +267,9 @@ li > input[type="checkbox"]:checked + * {
     -webkit-transition: .4s;
     transition: .4s;
     border-radius: 4px;
-  }
+}
   
-  .slider:before {
+.slider:before {
     position: absolute;
     content: "";
     height: 26px;
@@ -279,36 +279,36 @@ li > input[type="checkbox"]:checked + * {
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
-  }
+}
   
-  input:checked + .slider {
+input:checked + .slider {
     background-image: linear-gradient(to bottom, #ff1b43, #f06d06);
-  }
+}
   
-  input:focus + .slider {
+input:focus + .slider {
     box-shadow: 0 0 1px #ff1b43;
-  }
+}
   
-  input:checked + .slider:before {
+input:checked + .slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
-  }
+}
   
-  /* Rounded sliders */
-  .slider.round {
+/* Rounded sliders */
+.slider.round {
     border-radius: 34px;
-  }
+}
   
-  .slider.round:before {
+.slider.round:before {
     border-radius: 50%;
-  } 
+} 
 
-  .hidden {
+.hidden {
     display: none;
-  }
+}
 
-   #loggedin {
+ #loggedin {
     width: 80%;
     margin: 0 auto; 
     display: flex; 
@@ -323,8 +323,7 @@ li > input[type="checkbox"]:checked + * {
     @media only screen and (min-width: 992px) {
         width: 50%;
     }
-
-  }
+}
 
 #settingsContainer {
     width: 80%;
@@ -340,13 +339,13 @@ li > input[type="checkbox"]:checked + * {
     @media only screen and (min-width: 992px) {
         width: 60%;
     }
-
 }
 
 .fa-beat {
     animation:fa-beat 5s ease infinite;
-  }
-  @keyframes fa-beat {
+}
+
+@keyframes fa-beat {
     0% {
       transform:scale(1);
     }
@@ -371,5 +370,5 @@ li > input[type="checkbox"]:checked + * {
     70% {
       transform:scale(1);
     }
-  }
+}
   
