@@ -12,7 +12,7 @@ const SPOTIFY_API_ENDPOINT = 'https://api.spotify.com/v1';
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
-var redirect_uri = 'http://localhost:3000/callback'; 
+var redirect_uri = 'http://localhost:8888/callback'; 
 
 var stateKey = 'spotify_auth_state';
 
@@ -69,7 +69,7 @@ app.get('/callback', async function(req, res) {
 
 		var token_string = await getAccessToken(code);
 
-		res.redirect('/#' + token_string);
+		res.redirect('http://localhost:3000/?' + token_string);
 		
 	}
 	
@@ -96,10 +96,10 @@ app.get('/refresh_token', function(req, res) {
 	};
 
 	request.post(options, function(error, response, body) {
-			if (!error && response.statusCode === 200) {
-				var access_token = body.access_token;
-				res.send({'access_token': access_token});			
-			}
+		if (!error && response.statusCode === 200) {
+			var access_token = body.access_token;
+			res.send({'access_token': access_token});			
+		}
 	});
 
 });

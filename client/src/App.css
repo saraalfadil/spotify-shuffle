@@ -85,13 +85,8 @@ body {
   display: none;
 }
 
-#oauth {
-  margin-top: 20px;
-  text-align: left;
-}
-
-#oauth .card {
-  background-color: transparent;
+#player {
+  margin-top: 3em;
 }
 
 #player h4 {
