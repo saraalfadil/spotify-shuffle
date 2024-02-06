@@ -12,13 +12,13 @@ const SPOTIFY_API_ENDPOINT = 'https://api.spotify.com/v1';
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
-var redirect_uri = 'http://localhost:8888/callback'; 
+var redirect_uri = 'http://localhost:3000/callback'; 
 
 var stateKey = 'spotify_auth_state';
 
 var app = express();
 
-app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/client/public'))
 	 .use(cors())
 	 .use(cookieParser());
 
