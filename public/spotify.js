@@ -77,7 +77,7 @@
             console.error('Error:', error);
         });
 
-        // Get not playing info
+        // Get now playing info
         getPlayerInfo(accessToken, userId);
 
         // Restore shuffle button, remove loading state

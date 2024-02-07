@@ -70,10 +70,6 @@ body {
   background-color: transparent;
 }
 
-#login, #loggedin, #loading {
-  display: none;
-}
-
 .text-overflow {
   overflow: hidden;
   text-overflow: ellipsis;
