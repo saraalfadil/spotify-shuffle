@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import ShuffleOptions from './components/ShuffleOptions';
-import PlaylistGroup from './components/PlaylistGroup';
 import Player from './components/Player';
 import LogInButton from './components/LogInButton';
-import { getUserInfo, getPlayerInfo } from './utils.ts';
+import { getUserInfo, getPlayerInfo, getPlaylists } from './utils.ts';
 import './App.css';
 
 const App = function() {
   const [ error, setError ] = useState("");
   const [ userId, setUserId ] = useState(null);
   const [ playingTrack, setPlayingTrack ] = useState(null);
+  const [ playlists, setPlaylists ] = useState(null);
 
   const [isAuthenticated, setAuthenticated] = useState(() => {
     const token = localStorage.getItem("accessToken");
@@ -38,6 +38,11 @@ const App = function() {
         setPlayingTrack(player.item);
       }
 
+			if (!playlists) {
+        let playlists = await getPlaylists(accessToken, userId);
+        setPlaylists(playlists);
+      }
+
     } catch (error) {
       setError(error);
     }
@@ -61,18 +66,21 @@ const App = function() {
   }, [token, isAuthenticated]);
 
   return (
-    <div className="App">
-      <div className="container gradient-border" id="main">
-        {isAuthenticated ? (
-          <>
-            <Player track={playingTrack} />
-            <ShuffleOptions accessToken={accessToken} userId={userId} refreshNowPlaying={() => updateNowPlaying() } />
-          </>
-        ) : (
-          <LogInButton />
-        )}
-      </div>
-    </div>
+		<div className="container gradient-border" id="main">
+			{isAuthenticated ? (
+				<>
+					<Player track={playingTrack} />
+					<ShuffleOptions 
+						accessToken={accessToken} 
+						userId={userId} 
+						playlists={playlists} 
+						refreshNowPlaying={() => updateNowPlaying() } 
+					/>
+				</>
+			) : (
+				<LogInButton />
+			)}
+		</div>
   );
 }
 
