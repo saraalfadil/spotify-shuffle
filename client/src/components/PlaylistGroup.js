@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext.js';
 
-const PlaylistGroup = function ({ userId, playlists }) {
+const PlaylistGroup = function ({ playlists }) {
   const [selectAll, setSelectAll] = useState(true);
+  const { userId } = useAuth();
 
   const toggleSelectAll = () => {
     setSelectAll(!selectAll);

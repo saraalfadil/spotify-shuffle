@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { getUserInfo, getPlayerInfo } from '../utils.ts';
 
 const LogInButton = function () {
   return (

@@ -1,7 +1,7 @@
-var express = require('express');
-var request = require('request'); 
-var cors = require('cors');
-var cookieParser = require('cookie-parser');
+const express = require('express');
+const request = require('request'); 
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const { generateRandomString, shuffle } = require('./global.js');
@@ -12,11 +12,11 @@ const SPOTIFY_API_ENDPOINT = 'https://api.spotify.com/v1';
 
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
-var redirect_uri = 'http://localhost:8888/callback'; 
+const redirect_uri = 'http://localhost:8888/callback'; 
 
-var stateKey = 'spotify_auth_state';
+const stateKey = 'spotify_auth_state';
 
-var app = express();
+const app = express();
 
 app.use(express.static(__dirname + '/client/public'))
 	 .use(cors())
@@ -27,14 +27,14 @@ app.use(express.static(__dirname + '/client/public'))
 */
 app.get('/login', function(req, res) {
 
-	var state = generateRandomString(16);
+	const state = generateRandomString(16);
 
 	res.cookie(stateKey, state);
 
-	var scope = 'user-read-private user-read-email user-modify-playback-state'
+	let scope = 'user-read-private user-read-email user-modify-playback-state'
 		scope += ' user-read-playback-state user-library-read playlist-read-private';
 
-	let token_string = new URLSearchParams({
+	const token_string = new URLSearchParams({
 		response_type: 'code',
 		client_id: client_id,
 		scope: scope,
@@ -55,9 +55,9 @@ app.get('/login', function(req, res) {
 */
 app.get('/callback', async function(req, res) {
 
-	var code = req.query.code || null;
-	var state = req.query.state || null;
-	var storedState = req.cookies ? req.cookies[stateKey] : null;
+	const code = req.query.code || null;
+	const state = req.query.state || null;
+	const storedState = req.cookies ? req.cookies[stateKey] : null;
 
 	if (state === null || state !== storedState) {
 
@@ -67,7 +67,7 @@ app.get('/callback', async function(req, res) {
 		
 		res.clearCookie(stateKey);
 
-		var token_string = await getAccessToken(code);
+		const token_string = await getAccessToken(code);
 
 		res.redirect('http://localhost:3000/?' + token_string);
 		
@@ -84,8 +84,8 @@ app.get('/callback', async function(req, res) {
 */
 app.get('/refresh_token', function(req, res) {
 
-	var refresh_token = req.query.refresh_token;
-	var options = {
+	const refresh_token = req.query.refresh_token;
+	const options = {
 		url: SPOTIFY_TOKEN_ENDPOINT,
 		headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
 		form: {
@@ -97,7 +97,7 @@ app.get('/refresh_token', function(req, res) {
 
 	request.post(options, function(error, response, body) {
 		if (!error && response.statusCode === 200) {
-			var access_token = body.access_token;
+			const access_token = body.access_token;
 			res.send({'access_token': access_token});			
 		}
 	});
@@ -114,17 +114,17 @@ app.get('/refresh_token', function(req, res) {
 */
 app.get('/playlists', async function(req, res) {
 
-	var access_token = req.query.access_token;
-	var user_id = req.query.user_id;
+	const access_token = req.query.access_token;
+	const user_id = req.query.user_id;
 
 	// Get a list of my playlists 
-	let playlists = await getPlaylists(user_id, 0, access_token);
+	const playlists = await getPlaylists(user_id, 0, access_token);
 
 	// The limit is 50, so fetch them again
-	let playlists_2 = await getPlaylists(user_id, 50, access_token);
+	const playlists_2 = await getPlaylists(user_id, 50, access_token);
 	
 	// The limit is 50, so fetch them again
-	let playlists_3 = await getPlaylists(user_id, 100, access_token);
+	const playlists_3 = await getPlaylists(user_id, 100, access_token);
 
 	// Merge the playlists
 	all_playlists = [...playlists, ...playlists_2, ...playlists_3];
@@ -148,13 +148,13 @@ app.get('/playlists', async function(req, res) {
 */
 app.get('/shuffle', async function(req, res) {
 
-	var access_token = req.query.access_token;
-	var user_id = req.query.user_id;
-	var include_all_playlists = req.query.include_all_playlists;
-	var include_liked_tracks = req.query.include_liked_tracks;
-	var filter_playlists = req.query.filter_playlists || [];
+	const access_token = req.query.access_token;
+	const user_id = req.query.user_id;
+	const include_all_playlists = req.query.include_all_playlists;
+	const include_liked_tracks = req.query.include_liked_tracks;
+	const filter_playlists = req.query.filter_playlists || [];
 	
-	var all_tracks = [];
+	let all_tracks = [];
 
 	// If specific list of playlist was passed, use this
 	// Otherwise obtain list of user playlists
@@ -176,10 +176,10 @@ app.get('/shuffle', async function(req, res) {
 	} else {
 
 		// Get a list of my playlists 
-		let playlists = await getPlaylists(user_id, 0, access_token);
+		const playlists = await getPlaylists(user_id, 0, access_token);
 
 		// The limit is 50, so fetch them again
-		let playlists_2 = await getPlaylists(user_id, 50, access_token);
+		const playlists_2 = await getPlaylists(user_id, 50, access_token);
 
 		// Merge the 2 playlists
 		let all_playlists = [...playlists, ...playlists_2];
@@ -197,7 +197,7 @@ app.get('/shuffle', async function(req, res) {
 	all_tracks = [...all_tracks, ...liked_tracks];
 
 	// Remove duplicate tracks
-	var unique_tracks = all_tracks.reduce(function(a,b){
+	let unique_tracks = all_tracks.reduce(function(a,b){
 		if (a.indexOf(b) < 0 ) a.push(b);
 		return a;
 	},[]);
@@ -226,7 +226,7 @@ app.get('/shuffle', async function(req, res) {
 */
 const getTracksFromPlaylists = async function(playlists, include_all_playlists, user_id, access_token) {
 
-	var all_tracks = [];
+	let all_tracks = [];
 
 	// Iterate through each playlist
 	for(let i = 0; i < playlists.length; i++) {
@@ -269,7 +269,7 @@ const getPlaylists = function(user_id, offset, access_token) {
 	
 		try {
 		
-			var options = {
+			const options = {
 				url: `${SPOTIFY_API_ENDPOINT}/users/${user_id}/playlists?limit=50&offset=${offset}`,
 				headers: { 'Authorization': 'Bearer ' + access_token },
 				json: true
@@ -307,7 +307,7 @@ const getPlaylistTracks = function(url, access_token) {
 			
 			let tracks = [];
 	
-			var options = {
+			const options = {
 				url: `${url}?fields=items(track(id,name,href))`,
 				headers: { 'Authorization': 'Bearer ' + access_token },
 				json: true
@@ -360,7 +360,7 @@ const getLikedTracks = function(access_token) {
 	
 		try {
 		
-			var options = {
+			const options = {
 				url: `${SPOTIFY_API_ENDPOINT}/me/tracks`,
 				headers: { 'Authorization': 'Bearer ' + access_token },
 				json: true
@@ -396,7 +396,7 @@ const getAccessToken = function(code) {
 	
 		try {
 		
-			var options = {
+			const options = {
 				url: SPOTIFY_TOKEN_ENDPOINT,
 				form: {
 					code: code,
@@ -412,10 +412,10 @@ const getAccessToken = function(code) {
 			request.post(options, function(error, response, body) {
 				if (!error && response.statusCode === 200) {
 
-					var access_token = body.access_token; 
-					var refresh_token = body.refresh_token;
+					let access_token = body.access_token; 
+					let refresh_token = body.refresh_token;
 
-					var token_string = new URLSearchParams({
+					let token_string = new URLSearchParams({
 						access_token: access_token,
 						refresh_token: refresh_token
 					}).toString();

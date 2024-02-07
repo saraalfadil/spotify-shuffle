@@ -2,7 +2,7 @@ import { useState } from 'react';
 import ShuffleButton from './ShuffleButton';
 import PlaylistGroup from './PlaylistGroup';
 
-const ShuffleOptions = function({ accessToken, userId, playlists, refreshNowPlaying }) {
+const ShuffleOptions = function({ playlists, refreshNowPlaying }) {
 
 	const [myPlaylistsOnly, setMyPlaylistsOnly] = useState(true);
 	const [includeLikedTracks, setIncludeLikedTracks] = useState(true);
@@ -22,7 +22,7 @@ const ShuffleOptions = function({ accessToken, userId, playlists, refreshNowPlay
 
 	return (
 		<div id="settingsContainer">
-			<ShuffleButton accessToken={accessToken} userId={userId} myPlaylistsOnly={myPlaylistsOnly} includeLikedTracks={includeLikedTracks} refreshNowPlaying={refreshNowPlaying} />
+			<ShuffleButton myPlaylistsOnly={myPlaylistsOnly} includeLikedTracks={includeLikedTracks} refreshNowPlaying={refreshNowPlaying} />
 
 			<div className="options-group">
 				<div>
@@ -81,7 +81,7 @@ const ShuffleOptions = function({ accessToken, userId, playlists, refreshNowPlay
       </div>
 
 			{choosePlaylists && 
-				<PlaylistGroup userId={userId} playlists={playlists} />
+				<PlaylistGroup playlists={playlists} />
 			}
 
     </div>

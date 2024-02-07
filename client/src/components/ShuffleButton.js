@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext.js';
 import { getShuffledTracks, playTracks } from '../utils.ts';
 import { default as loadingIcon } from '../assets/loading.svg';
 import { default as shuffleIcon } from '../assets/shuffle.svg';
 
-const ShuffleButton = function({ accessToken, userId, myPlaylistsOnly, includeLikedTracks, refreshNowPlaying }) {
+const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNowPlaying }) {
 
   const [ isLoading, setIsLoading ] = useState(false);
+	const { accessToken, userId } = useAuth();
 
   const shuffle = async() => {
 
