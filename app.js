@@ -6,15 +6,14 @@ require('dotenv').config();
 
 const { generateRandomString, shuffle } = require('./global.js');
 
-const SPOTIFY_TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token/';
-const SPOTIFY_AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize/';
-const SPOTIFY_API_ENDPOINT = 'https://api.spotify.com/v1';
-
-const client_id = process.env.CLIENT_ID;
-const client_secret = process.env.CLIENT_SECRET;
-const redirect_uri = 'http://localhost:8888/callback';
-
-const stateKey = 'spotify_auth_state';
+const SPOTIFY_TOKEN_ENDPOINT = process.env.SPOTIFY_TOKEN_ENDPOINT;
+const SPOTIFY_AUTH_ENDPOINT = process.env.SPOTIFY_AUTH_ENDPOINT;
+const SPOTIFY_API_ENDPOINT = process.env.SPOTIFY_API_ENDPOINT;
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
+const STATE_KEY = process.env.STATE_KEY;
+const SITE_URL = process.env.SITE_URL;
 
 const app = express();
 
@@ -29,16 +28,16 @@ app.get('/login', function (req, res) {
 
 	const state = generateRandomString(16);
 
-	res.cookie(stateKey, state);
+	res.cookie(STATE_KEY, state);
 
 	let scope = 'user-read-private user-read-email user-modify-playback-state'
 	scope += ' user-read-playback-state user-library-read playlist-read-private';
 
 	const token_string = new URLSearchParams({
 		response_type: 'code',
-		client_id: client_id,
+		client_id: CLIENT_ID,
 		scope: scope,
-		redirect_uri: redirect_uri,
+		redirect_uri: REDIRECT_URI,
 		state: state
 	}).toString();
 
@@ -57,21 +56,26 @@ app.get('/callback', async function (req, res) {
 
 	const code = req.query.code || null;
 	const state = req.query.state || null;
-	const storedState = req.cookies ? req.cookies[stateKey] : null;
+	const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
 
-	if (state === null || state !== storedState) {
+	try {
+		if (state === null || state !== storedState) {
 
-		res.send({ message: 'State mismatch' });
-
-	} else {
-
-		res.clearCookie(stateKey);
-
-		const token_string = await getAccessToken(code);
-
-		res.redirect('http://localhost:3000/?' + token_string);
-
+			res.send({ message: 'State mismatch' });
+	
+		} else {
+	
+			res.clearCookie(STATE_KEY);
+	
+			const token_string = await getAccessToken(code);
+	
+			res.redirect(SITE_URL + '/?' + token_string);
+	
+		}
+	} catch(e) {
+		console.log("Error: ", e);
 	}
+
 
 });
 
@@ -87,7 +91,7 @@ app.get('/refresh_token', function (req, res) {
 	const refresh_token = req.query.refresh_token;
 	const options = {
 		url: SPOTIFY_TOKEN_ENDPOINT,
-		headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
+		headers: { 'Authorization': 'Basic ' + (new Buffer(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64')) },
 		form: {
 			grant_type: 'refresh_token',
 			refresh_token: refresh_token
@@ -400,11 +404,11 @@ const getAccessToken = function (code) {
 				url: SPOTIFY_TOKEN_ENDPOINT,
 				form: {
 					code: code,
-					redirect_uri: redirect_uri,
+					redirect_uri: REDIRECT_URI,
 					grant_type: 'authorization_code'
 				},
 				headers: {
-					'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+					'Authorization': 'Basic ' + (new Buffer(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'))
 				},
 				json: true
 			};
