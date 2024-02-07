@@ -99,14 +99,37 @@ function ShuffleButton() {
 
 function ShuffleOptions() {
 
+  const [myPlaylistsOnly, setMyPlaylistsOnly] = useState(true);
+  const [includeLikedTracks, setIncludeLikedTracks] = useState(true);
+  const [choosePlaylists, setChoosePlaylists] = useState(false);
+
+  const toggleMyPlaylistsOnly = () => {
+    setMyPlaylistsOnly(!myPlaylistsOnly);
+  };
+
+  const toggleIncludeLikedTracks = () => {
+    setIncludeLikedTracks(!includeLikedTracks);
+  };
+
+  const toggleChoosePlaylists = () => {
+    setChoosePlaylists(!choosePlaylists);
+  };
+
   return (
     <div className="options-group">
       <div>
         <p id="myPlaylistsOnlyLabel" className="options-label">My playlists only</p>
         <div className="options-checkbox"> 
-          <p id="myPlaylistsOnlyValue">ON</p>
+          <p id="myPlaylistsOnlyValue">{myPlaylistsOnly ? "ON" : "OFF"}</p>
           <label className="switch">
-            <input type="checkbox" id="myPlaylistsOnlyCheckbox" aria-labelledby="myPlaylistsOnlyLabel" value="ON" checked="true"/>
+            <input 
+              type="checkbox" 
+              id="myPlaylistsOnlyCheckbox" 
+              aria-labelledby="myPlaylistsOnlyLabel" 
+              value="ON" 
+              checked={myPlaylistsOnly}
+              onChange={toggleMyPlaylistsOnly}
+            />
             <span className="slider"></span>
           </label>
         </div>
@@ -115,9 +138,16 @@ function ShuffleOptions() {
       <div>
         <p id="includeLikedTracksLabel" className="options-label">Include liked tracks</p>
         <div className="options-checkbox">
-          <p id="includeLikedTracksValue">ON</p>
+          <p id="includeLikedTracksValue">{includeLikedTracks ? "ON" : "OFF"}</p>
           <label className="switch">
-            <input type="checkbox" id="includeLikedTracksCheckbox" aria-labelledby="includeLikedTracksLabel" value="ON" checked="true"/>
+            <input 
+              type="checkbox" 
+              id="includeLikedTracksCheckbox" 
+              aria-labelledby="includeLikedTracksLabel" 
+              value="ON" 
+              checked={includeLikedTracks}
+              onChange={toggleIncludeLikedTracks}
+            />
             <span className="slider"></span>
           </label>
         </div>
@@ -126,9 +156,15 @@ function ShuffleOptions() {
       <div>
         <p id="choosePlaylistsLabel" className="options-label">Choose playlists</p>
         <div className="options-checkbox">
-          <p id="choosePlaylistsValue">OFF</p>
+          <p id="choosePlaylistsValue">{choosePlaylists ? "ON" : "OFF"}</p>
             <label className="switch">
-              <input type="checkbox" id="choosePlaylistsCheckbox" aria-labelledby="choosePlaylistsLabel"/>
+              <input 
+                type="checkbox" 
+                id="choosePlaylistsCheckbox"
+                aria-labelledby="choosePlaylistsLabel"
+                checked={choosePlaylists}
+                onChange={toggleChoosePlaylists}
+              />
               <span className="slider"></span>
             </label>
           </div>
