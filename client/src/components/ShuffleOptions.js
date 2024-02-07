@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ShuffleButton from './ShuffleButton';
+import ShuffleToggle from './ShuffleToggle';
 import PlaylistGroup from './PlaylistGroup';
 
 const ShuffleOptions = function({ playlists, refreshNowPlaying }) {
@@ -41,25 +42,3 @@ const ShuffleOptions = function({ playlists, refreshNowPlaying }) {
 }
 
 export default ShuffleOptions;
-
-const ShuffleToggle = function({ label, value, onChange }) {
-	return (
-		<div>
-			<p id="myPlaylistsOnlyLabel" className="options-label">{label}</p>
-			<div className="options-checkbox"> 
-				<p id="myPlaylistsOnlyValue">{value ? "ON" : "OFF"}</p>
-				<label className="switch">
-					<input 
-						type="checkbox" 
-						id="myPlaylistsOnlyCheckbox" 
-						aria-labelledby="myPlaylistsOnlyLabel" 
-						value="ON" 
-						checked={value}
-						onChange={onChange}
-						/>
-					<span className="slider"></span>
-				</label>
-			</div>
-		</div>
-	)
-}
