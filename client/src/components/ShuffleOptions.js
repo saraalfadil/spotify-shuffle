@@ -25,67 +25,41 @@ const ShuffleOptions = function({ playlists, refreshNowPlaying }) {
 			<ShuffleButton myPlaylistsOnly={myPlaylistsOnly} includeLikedTracks={includeLikedTracks} refreshNowPlaying={refreshNowPlaying} />
 
 			<div className="options-group">
-				<div>
-					<p id="myPlaylistsOnlyLabel" className="options-label">My playlists only</p>
-					<div className="options-checkbox"> 
-						<p id="myPlaylistsOnlyValue">{myPlaylistsOnly ? "ON" : "OFF"}</p>
-						<label className="switch">
-							<input 
-								type="checkbox" 
-								id="myPlaylistsOnlyCheckbox" 
-								aria-labelledby="myPlaylistsOnlyLabel" 
-								value="ON" 
-								checked={myPlaylistsOnly}
-								onChange={toggleMyPlaylistsOnly}
-								/>
-							<span className="slider"></span>
-						</label>
-					</div>
-				</div>
+				<ShuffleToggle label="My playlists only" value={myPlaylistsOnly} onChange={toggleMyPlaylistsOnly} />
 
-				<div>
-					<p id="includeLikedTracksLabel" className="options-label">Include liked tracks</p>
-					<div className="options-checkbox">
-						<p id="includeLikedTracksValue">{includeLikedTracks ? "ON" : "OFF"}</p>
-						<label className="switch">
-							<input 
-								type="checkbox" 
-								id="includeLikedTracksCheckbox" 
-								aria-labelledby="includeLikedTracksLabel" 
-								value="ON" 
-								checked={includeLikedTracks}
-								onChange={toggleIncludeLikedTracks}
-								/>
-								<span className="slider"></span>
-						</label>
-					</div>
-				</div>
+				<ShuffleToggle label="Include liked tracks" value={includeLikedTracks} onChange={toggleIncludeLikedTracks} />
 
-				<div>
-					<p id="choosePlaylistsLabel" className="options-label">Choose playlists</p>
-					<div className="options-checkbox">
-						<p id="choosePlaylistsValue">{choosePlaylists ? "ON" : "OFF"}</p>
-							<label className="switch">
-							<input 
-									type="checkbox" 
-									id="choosePlaylistsCheckbox"
-									aria-labelledby="choosePlaylistsLabel"
-									checked={choosePlaylists}
-									onChange={toggleChoosePlaylists}
-							/>
-							<span className="slider"></span>
-							</label>
-					</div>
-				</div>
-
-      </div>
+				<ShuffleToggle label="Choose playlists only" value={choosePlaylists} onChange={toggleChoosePlaylists} />
+      		</div>
 
 			{choosePlaylists && 
 				<PlaylistGroup playlists={playlists} />
 			}
 
-    </div>
-  )
+    	</div>
+   )
 }
 
 export default ShuffleOptions;
+
+const ShuffleToggle = function({ label, value, onChange }) {
+	return (
+		<div>
+			<p id="myPlaylistsOnlyLabel" className="options-label">{label}</p>
+			<div className="options-checkbox"> 
+				<p id="myPlaylistsOnlyValue">{value ? "ON" : "OFF"}</p>
+				<label className="switch">
+					<input 
+						type="checkbox" 
+						id="myPlaylistsOnlyCheckbox" 
+						aria-labelledby="myPlaylistsOnlyLabel" 
+						value="ON" 
+						checked={value}
+						onChange={onChange}
+						/>
+					<span className="slider"></span>
+				</label>
+			</div>
+		</div>
+	)
+}
