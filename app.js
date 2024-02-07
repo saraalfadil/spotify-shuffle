@@ -9,6 +9,7 @@ const { generateRandomString, shuffle } = require('./global.js');
 const SPOTIFY_TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token/';
 const SPOTIFY_AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize/';
 const SPOTIFY_API_ENDPOINT = 'https://api.spotify.com/v1'; 
+
 const client_id = process.env.CLIENT_ID;
 const client_secret = process.env.CLIENT_SECRET;
 const redirect_uri = 'http://localhost:8888/callback'; 
