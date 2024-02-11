@@ -111,6 +111,7 @@ body {
 
 #playlistsContainer ul {
   list-style-type: none;
+  padding-left: 0px;
 }
 
 #playlistsContainer ul li {
@@ -125,6 +126,10 @@ body {
   overflow: hidden;
   width: 190px;
   white-space: nowrap;
+}
+
+.select-playlists {
+	margin-bottom: 10px;
 }
 
 .playlist-section {

@@ -100,7 +100,7 @@ export const playTracks = async (accessToken, tracks) => {
       },
       body: JSON.stringify({
           uris: tracks
-      }),
+      })
     });
     if (!response) {
       throw new Error('Failed to fetch player information');

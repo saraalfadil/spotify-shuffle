@@ -12,7 +12,7 @@ const PlaylistGroup = function ({ playlists }) {
   return (
     <div id="playlistsContainer">
       <div className="playlist-section">
-        <div style={{float: 'left', marginLeft: '40px', marginBottom: '10px'}}>
+        <div className="select-playlists">
           <input 
             type="checkbox" 
             id="selectAllPlaylists" 
