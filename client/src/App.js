@@ -26,15 +26,15 @@ const App = function() {
 	}
 	
 	// Filter playlists based on "My playlists only" selection
-	const filterPlaylists = useCallback(() => {
-		return allPlaylists.filter(playlist => {
+	const filterPlaylists = useCallback(playlists => {
+		return playlists.filter(playlist => {
 			return playlist.owner && playlist.owner.id === userId;
 		});
-    })
+    }, [userId])
 
 	const refreshPlaylists = myPlaylistsOnly => {
 		if (myPlaylistsOnly) {
-			setMyPlaylists(filterPlaylists())
+			setMyPlaylists(filterPlaylists(allPlaylists))
 		} else {
 			setMyPlaylists(allPlaylists);
 		}
@@ -55,7 +55,7 @@ const App = function() {
 				if (allPlaylists.length === 0) {
 					let playlists = await getPlaylists(accessToken, userId);
 					setAllPlaylists(playlists);
-					setMyPlaylists(filterPlaylists());
+					setMyPlaylists(filterPlaylists(playlists));
 				}
 
 			} catch (e) {

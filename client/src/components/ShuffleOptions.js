@@ -11,7 +11,7 @@ const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists
 
 	const toggleMyPlaylistsOnly = () => {
 		setMyPlaylistsOnly(!myPlaylistsOnly);
-		refreshPlaylists(myPlaylistsOnly);
+		refreshPlaylists(!myPlaylistsOnly);
 	};
 
 	const toggleIncludeLikedTracks = () => {
