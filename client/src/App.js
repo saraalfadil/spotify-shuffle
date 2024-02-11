@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ShuffleOptions from './components/ShuffleOptions';
 import Player from './components/Player';
 import LogInButton from './components/LogInButton';
@@ -10,7 +10,8 @@ import './App.css';
 const App = function() {
 	const [ error, setError ] = useState("");
 	const [ playingTrack, setPlayingTrack ] = useState(null);
-	const [ playlists, setPlaylists ] = useState(null);
+	const [ allPlaylists, setAllPlaylists ] = useState([]);
+	const [ myPlaylists, setMyPlaylists ] = useState([]);
 	const { accessToken, isAuthenticated, userId } = useAuth();
 
 	const refreshNowPlaying = async () => {
@@ -21,6 +22,21 @@ const App = function() {
 
 		} catch(e) {
 			setError(e);
+		}
+	}
+	
+	// Filter playlists based on "My playlists only" selection
+	const filterPlaylists = useCallback(() => {
+		return allPlaylists.filter(playlist => {
+			return playlist.owner && playlist.owner.id === userId;
+		});
+    })
+
+	const refreshPlaylists = myPlaylistsOnly => {
+		if (myPlaylistsOnly) {
+			setMyPlaylists(filterPlaylists())
+		} else {
+			setMyPlaylists(allPlaylists);
 		}
 	}
 
@@ -36,9 +52,10 @@ const App = function() {
 				}
 				
 				// Pull all playlists
-				if (!playlists) {
+				if (allPlaylists.length === 0) {
 					let playlists = await getPlaylists(accessToken, userId);
-					setPlaylists(playlists);
+					setAllPlaylists(playlists);
+					setMyPlaylists(filterPlaylists());
 				}
 
 			} catch (e) {
@@ -49,7 +66,7 @@ const App = function() {
     if (isAuthenticated) 
 		getData();
 
-  }, [isAuthenticated, userId, accessToken, playingTrack, playlists]);
+  }, [isAuthenticated, userId, accessToken, playingTrack, allPlaylists, filterPlaylists]);
 
   return (
 	<Container>
@@ -57,8 +74,9 @@ const App = function() {
 			<>
 				<Player track={playingTrack} />
 				<ShuffleOptions 
-					playlists={playlists} 
-					refreshNowPlaying={() => refreshNowPlaying() } 
+					playlists={myPlaylists}
+					refreshNowPlaying={() => refreshNowPlaying()} 
+					refreshPlaylists={myPlaylistsOnly => refreshPlaylists(myPlaylistsOnly)} 
 				/>
 			</>
 		) : (

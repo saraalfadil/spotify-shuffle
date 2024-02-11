@@ -3,14 +3,15 @@ import ShuffleButton from './ShuffleButton';
 import ShuffleToggle from './ShuffleToggle';
 import PlaylistGroup from './PlaylistGroup';
 
-const ShuffleOptions = function({ playlists, refreshNowPlaying }) {
+const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists }) {
 
-	const [myPlaylistsOnly, setMyPlaylistsOnly] = useState(true);
-	const [includeLikedTracks, setIncludeLikedTracks] = useState(true);
-	const [choosePlaylists, setChoosePlaylists] = useState(false);
+	const [ myPlaylistsOnly, setMyPlaylistsOnly ] = useState(true);
+	const [ includeLikedTracks, setIncludeLikedTracks ] = useState(true);
+	const [ choosePlaylists, setChoosePlaylists ] = useState(false);
 
 	const toggleMyPlaylistsOnly = () => {
 		setMyPlaylistsOnly(!myPlaylistsOnly);
+		refreshPlaylists(myPlaylistsOnly);
 	};
 
 	const toggleIncludeLikedTracks = () => {

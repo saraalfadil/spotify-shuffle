@@ -23,7 +23,7 @@ const PlaylistGroup = function ({ playlists }) {
           <label><strong>Select/Deselect all</strong></label>
         </div>
         <div style={{clear: 'both' }}>
-          {playlists && playlists.length &&
+          {playlists && playlists.length > 0 &&
             <ul id="playlists">
               {playlists.map(playlist => {
                 
