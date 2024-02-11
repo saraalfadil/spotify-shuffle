@@ -71,7 +71,12 @@ const App = function() {
   return (
 	<Container>
 		{isAuthenticated ? (
-			<>
+			<>	
+				{ error &&
+					<div className="alert alert-danger">
+						{error}
+					</div>
+				}
 				<Player track={playingTrack} />
 				<ShuffleOptions 
 					playlists={myPlaylists}
