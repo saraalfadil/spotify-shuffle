@@ -34,14 +34,14 @@ export const AuthProvider = ({ children }) => {
 				setAuthenticated(true);
 
 				if (!userId) {
-					let user = await getUserInfo(token);
+					let user = await getUserInfo({ accessToken: token });
 					setUserId(user.id);
 				}
 	
 			}
 		}
 		logIn();
-  	}, [isAuthenticated, token, userId]);
+  	}, [token, userId]);
 
 	return (
 		<AuthContext.Provider value={{ isAuthenticated, accessToken, userId }}>

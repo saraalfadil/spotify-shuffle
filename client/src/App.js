@@ -74,7 +74,7 @@ const App = function() {
 			<>	
 				{ error &&
 					<div className="alert alert-danger">
-						{error}
+						{error?.message}
 					</div>
 				}
 				<Player track={playingTrack} />

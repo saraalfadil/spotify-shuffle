@@ -1,25 +1,29 @@
+const SPOTIFY_API_ENDPOINT = 'https://api.spotify.com/v1';
+const SITE_URL = 'http://localhost:8888';
+
 // Get user information
-export const getUserInfo = async (accessToken) => {
-  try {
-    const response = await fetch('https://api.spotify.com/v1/me', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + accessToken
-      }
-    });
-    if (!response) {
-      throw new Error('Failed to fetch user information');
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+export const getUserInfo = async ({ accessToken } : { accessToken: string }) => {
+
+	console.log("accessToken: ", accessToken);
+	try {
+		const response = await fetch(`${SPOTIFY_API_ENDPOINT}/me`, {
+			method: 'GET',
+			headers: {
+				'Authorization': 'Bearer ' + accessToken
+			}
+		});
+		if (!response) {
+			throw new Error('Failed to fetch user information');
+		}
+		return await response.json();
+	} catch (error) {
+		throw new Error(error instanceof Error ? error.message : 'Error');
+	}
 }
 // Get information about the currently playing track
-export const getPlayerInfo = async (accessToken) => {
+export const getPlayerInfo = async ({ accessToken } : { accessToken: string}) => {
   try {
-    const response = await fetch('https://api.spotify.com/v1/me/player/', {
+    const response = await fetch(`${SPOTIFY_API_ENDPOINT}/me/player`, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + accessToken
@@ -28,22 +32,21 @@ export const getPlayerInfo = async (accessToken) => {
     if (!response) {
       throw new Error('Failed to fetch player information');
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error instanceof Error ? error.message : 'Error');
   }
 }
 
 // Pull a list of all my playlists
-export const getPlaylists = async (accessToken, userId) => {
+export const getPlaylists = async ({ accessToken, userId } : { accessToken: string, userId: string }) => {
   try {
     let queryParams = new URLSearchParams({
       'access_token': accessToken,
       'user_id': userId
     });
 
-    const response = await fetch('http://localhost:8888/playlists/?' + queryParams, {
+    const response = await fetch(`${SITE_URL}/playlists/?` + queryParams, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -55,28 +58,33 @@ export const getPlaylists = async (accessToken, userId) => {
     const data = await response.json();
     return data.playlists;
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error instanceof Error ? error.message : 'Error');
   }
 }
 
 // Fetch shuffled tracks
-export const getShuffledTracks = async (accessToken, userId, myPlaylistsOnly, includeLikedTracks) => {
+interface ShuffleProps { 
+	accessToken: string, 
+	userId: string, 
+	myPlaylistsOnly: boolean, 
+	includeLikedTracks: boolean,
+	//'filter_playlists': filter_playlists
+}
+
+export const getShuffledTracks = async (ShuffleProps: ShuffleProps) => {
 
   try {
-
     let queryParams = new URLSearchParams({
-      'access_token': accessToken,
-      'user_id': userId,
-      'include_all_playlists': myPlaylistsOnly,
-      'include_liked_tracks': includeLikedTracks,
-      //'filter_playlists': filter_playlists
-    });
+		...ShuffleProps, 
+		myPlaylistsOnly: ShuffleProps.myPlaylistsOnly.toString(), 
+		includeLikedTracks: ShuffleProps.includeLikedTracks.toString(),
+	});
 
-    const response = await fetch('http://localhost:8888/shuffle/?' + queryParams, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    const response = await fetch(`${SITE_URL}/shuffle/?` + queryParams, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json'
+		}
     });
     if (!response) {
       throw new Error('Failed to fetch shuffle information');
@@ -84,15 +92,15 @@ export const getShuffledTracks = async (accessToken, userId, myPlaylistsOnly, in
     const data = await response.json();
     return data.all_tracks;
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error instanceof Error ? error.message : 'Error');
   }
 }
     
 // Initiate playback on the active user device
-export const playTracks = async (accessToken, tracks) => {
+export const playTracks = async ({ accessToken, tracks }: { accessToken: string, tracks: Array<string> }) => {
   try {
 
-    const response = await fetch('https://api.spotify.com/v1/me/player/play/', {
+    const response = await fetch(`${SPOTIFY_API_ENDPOINT}/me/player/play`, {
       method: 'PUT',
       headers: {
         'Authorization': 'Bearer ' + accessToken,
@@ -107,6 +115,6 @@ export const playTracks = async (accessToken, tracks) => {
     }
 
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error(error instanceof Error ? error.message : 'Error');
   }
 }
