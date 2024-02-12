@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import ShuffleButton from './ShuffleButton';
 import ShuffleToggle from './ShuffleToggle';
 import PlaylistGroup from './PlaylistGroup';
 
-const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists }) {
+const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists }: { playlists: Array<string>, refreshNowPlaying: Function, refreshPlaylists: Function }) {
 
 	const [ myPlaylistsOnly, setMyPlaylistsOnly ] = useState(true);
 	const [ includeLikedTracks, setIncludeLikedTracks ] = useState(true);

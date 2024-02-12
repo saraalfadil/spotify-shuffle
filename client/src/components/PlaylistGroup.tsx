@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { useAuth } from '../context/AuthContext.js';
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
-const PlaylistGroup = function ({ playlists }) {
+const PlaylistGroup = function ({ playlists }: { playlists: Array<any>}) {
   const [selectAll, setSelectAll] = useState(true);
   const { userId } = useAuth();
 

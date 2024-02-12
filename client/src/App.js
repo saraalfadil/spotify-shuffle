@@ -3,7 +3,7 @@ import ShuffleOptions from './components/ShuffleOptions';
 import Player from './components/Player';
 import LogInButton from './components/LogInButton';
 import Container from './components/Container';
-import { useAuth } from './context/AuthContext.js';
+import { useAuth } from './context/AuthContext';
 import { getPlayerInfo, getPlaylists } from './utils.ts';
 import './App.css';
 
@@ -47,13 +47,13 @@ const App = function() {
 				
 				// Populate the now playing track info
 				if (!playingTrack) {
-					let player = await getPlayerInfo(accessToken);
+					let player = await getPlayerInfo({ accessToken });
 					setPlayingTrack(player.item);
 				}
 				
 				// Pull all playlists
 				if (allPlaylists.length === 0) {
-					let playlists = await getPlaylists(accessToken, userId);
+					let playlists = await getPlaylists({ accessToken, userId });
 					setAllPlaylists(playlists);
 					setMyPlaylists(filterPlaylists(playlists));
 				}

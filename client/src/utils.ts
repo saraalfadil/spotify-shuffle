@@ -97,7 +97,7 @@ export const getShuffledTracks = async (ShuffleProps: ShuffleProps) => {
 }
     
 // Initiate playback on the active user device
-export const playTracks = async ({ accessToken, tracks }: { accessToken: string, tracks: Array<string> }) => {
+export const playTracks = async ({ accessToken, allTracks }: { accessToken: string, allTracks: Array<string> }) => {
   try {
 
     const response = await fetch(`${SPOTIFY_API_ENDPOINT}/me/player/play`, {
@@ -107,7 +107,7 @@ export const playTracks = async ({ accessToken, tracks }: { accessToken: string,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-          uris: tracks
+          uris: allTracks
       })
     });
     if (!response) {
