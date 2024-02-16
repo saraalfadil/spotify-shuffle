@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+const SITE_URL = process.env.REACT_APP_SITE_URL;
 
 const LogInButton = function () {
   return (
-    <a href="http://localhost:8888/login" className="btn-login btn">Log in with Spotify</a>
+    <a href={`${SITE_URL}/login`} className="btn-login btn">Log in with Spotify</a>
   )
 }
 

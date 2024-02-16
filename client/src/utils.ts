@@ -1,5 +1,5 @@
 const SPOTIFY_API_ENDPOINT = 'https://api.spotify.com/v1';
-const SITE_URL = 'http://localhost:8888';
+const SITE_URL = process.env.REACT_APP_SITE_URL;
 
 // Get user information
 export const getUserInfo = async ({ accessToken } : { accessToken: string }) => {
