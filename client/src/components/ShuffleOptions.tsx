@@ -3,7 +3,13 @@ import ShuffleButton from './ShuffleButton';
 import ShuffleToggle from './ShuffleToggle';
 import PlaylistGroup from './PlaylistGroup';
 
-const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists }: { playlists: Array<string>, refreshNowPlaying: Function, refreshPlaylists: Function }) {
+interface ShuffleOptionsProps {
+	playlists: Array<string>, 
+	refreshNowPlaying: Function, 
+	refreshPlaylists: Function
+}
+
+const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists }: ShuffleOptionsProps) {
 
 	const [ myPlaylistsOnly, setMyPlaylistsOnly ] = useState(true);
 	const [ includeLikedTracks, setIncludeLikedTracks ] = useState(true);

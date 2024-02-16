@@ -4,7 +4,13 @@ import { getShuffledTracks, playTracks } from '../utils.ts';
 import { default as loadingIcon } from '../assets/loading.svg';
 import { default as shuffleIcon } from '../assets/shuffle.svg';
 
-const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNowPlaying }: { myPlaylistsOnly: boolean, includeLikedTracks: boolean, refreshNowPlaying: Function }) {
+interface ShuffleButtonProps {
+	myPlaylistsOnly: boolean,
+	includeLikedTracks: boolean,
+	refreshNowPlaying: Function
+}
+
+const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNowPlaying }: ShuffleButtonProps ) {
 
   	const [ isLoading, setIsLoading ] = useState(false);
 	const { accessToken, userId } = useAuth();
@@ -13,11 +19,14 @@ const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNow
 
 		setIsLoading(true);
 
-		// Fetch and play shuffled tracks
+		// Fetch shuffled tracks
 		const allTracks = await getShuffledTracks({ accessToken, userId, myPlaylistsOnly, includeLikedTracks });
+
+		// Play shuffled tracks
 		if (allTracks) 
 			await playTracks({ accessToken, allTracks });
-
+		
+		// Refresh now playing song
 		await refreshNowPlaying();
 
 		setIsLoading(false);

@@ -1,6 +1,12 @@
 import React, { ChangeEventHandler } from 'react';
 
-const ShuffleToggle = function({ label, value, onChange } : { label: string, value: boolean, onChange: ChangeEventHandler<HTMLInputElement> } ) {
+interface ShuffleToggleProps { 
+	label: string, 
+	value: boolean, 
+	onChange: ChangeEventHandler<HTMLInputElement> 
+}
+
+const ShuffleToggle = function({ label, value, onChange } : ShuffleToggleProps) {
 	return (
 		<div>
 			<p id="myPlaylistsOnlyLabel" className="options-label">{label}</p>

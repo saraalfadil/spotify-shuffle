@@ -16,12 +16,12 @@ export const AuthProvider = ({ children }: { children: ReactNode}) => {
 
     const [isAuthenticated, setAuthenticated] = useState(() => {
         const token = localStorage.getItem('accessToken') || '';
-        return token !== null;
+        return token.length > 0;
     });
 
     const [accessToken, setAccessToken] = useState(() => {
         const token = localStorage.getItem("accessToken") || '';
-        return JSON.parse(token);
+        return token;
     });
 
 	const queryString = window.location.search;
