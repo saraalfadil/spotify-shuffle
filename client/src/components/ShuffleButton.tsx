@@ -20,7 +20,14 @@ const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNow
 		setIsLoading(true);
 
 		// Fetch shuffled tracks
-		const allTracks = await getShuffledTracks({ accessToken, userId, myPlaylistsOnly, includeLikedTracks });
+		const allTracks = await getShuffledTracks({ 
+			access_token: accessToken, 
+			user_id: userId, 
+			my_playlists_only: myPlaylistsOnly, 
+			include_liked_tracks: includeLikedTracks 
+		});
+
+		console.log("Shuffled tracks:", allTracks);
 
 		// Play shuffled tracks
 		if (allTracks) 
