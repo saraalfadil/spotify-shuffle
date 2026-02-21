@@ -14,6 +14,7 @@ const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists
 	const [ myPlaylistsOnly, setMyPlaylistsOnly ] = useState(true);
 	const [ includeLikedTracks, setIncludeLikedTracks ] = useState(true);
 	const [ choosePlaylists, setChoosePlaylists ] = useState(false);
+	const [ selectedPlaylists, setSelectedPlaylists ] = useState<Set<string>>(new Set());
 
 	const toggleMyPlaylistsOnly = () => {
 		setMyPlaylistsOnly(!myPlaylistsOnly);
@@ -30,7 +31,13 @@ const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists
 
 	return (
 		<div id="settingsContainer">
-			<ShuffleButton myPlaylistsOnly={myPlaylistsOnly} includeLikedTracks={includeLikedTracks} refreshNowPlaying={refreshNowPlaying} />
+			<ShuffleButton 
+				myPlaylistsOnly={myPlaylistsOnly} 
+				includeLikedTracks={includeLikedTracks} 
+				refreshNowPlaying={refreshNowPlaying} 
+				choosePlaylists={choosePlaylists} 
+				selectedPlaylists={selectedPlaylists}
+			/>
 
 			<div className="options-group">
 				<ShuffleToggle label="My playlists only" value={myPlaylistsOnly} onChange={toggleMyPlaylistsOnly} />
@@ -41,7 +48,11 @@ const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists
       		</div>
 
 			{choosePlaylists && 
-				<PlaylistGroup playlists={playlists} />
+				<PlaylistGroup 
+					playlists={playlists} 
+					selectedPlaylists={selectedPlaylists} 
+					setSelectedPlaylists={setSelectedPlaylists} 
+				/>
 			}
 
     	</div>

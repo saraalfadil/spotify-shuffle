@@ -63,22 +63,25 @@ export const getPlaylists = async ({ accessToken, userId } : { accessToken: stri
 }
 
 // Fetch shuffled tracks
-interface ShuffleProps { 
-	access_token: string, 
-	user_id: string, 
-	my_playlists_only: boolean, 
+interface ShuffleProps {
+	access_token: string,
+	user_id: string,
+	my_playlists_only: boolean,
 	include_liked_tracks: boolean,
-	//'filter_playlists': filter_playlists
+	filter_playlists?: string[]
 }
 
 export const getShuffledTracks = async (ShuffleProps: ShuffleProps) => {
 
   try {
     let queryParams = new URLSearchParams({
-		...ShuffleProps, 
-		my_playlists_only: ShuffleProps.my_playlists_only.toString(), 
+		access_token: ShuffleProps.access_token,
+		user_id: ShuffleProps.user_id,
+		my_playlists_only: ShuffleProps.my_playlists_only.toString(),
 		include_liked_tracks: ShuffleProps.include_liked_tracks.toString(),
 	});
+
+	ShuffleProps.filter_playlists?.forEach(href => queryParams.append('filter_playlists', href));
 
     const response = await fetch(`${SITE_URL}/shuffle/?` + queryParams, {
 		method: 'GET',

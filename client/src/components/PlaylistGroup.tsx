@@ -1,30 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
-const PlaylistGroup = function ({ playlists }: { playlists: Array<any>}) {
+const PlaylistGroup = function ({ playlists, selectedPlaylists, setSelectedPlaylists }: { playlists: Array<any>, selectedPlaylists: Set<string>, setSelectedPlaylists: Function }) {
   const { userId } = useAuth();
-  const [checkedPlaylists, setCheckedPlaylists] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const allHrefs = playlists
       .map((p: any) => p?.tracks?.href)
       .filter(Boolean) as string[];
-    setCheckedPlaylists(new Set(allHrefs));
+    setSelectedPlaylists(new Set(allHrefs));
   }, [playlists]);
 
   const allHrefs = playlists.map(p => p?.tracks?.href).filter(Boolean) as string[];
-  const selectAll = allHrefs.length > 0 && checkedPlaylists.size === allHrefs.length;
+  const selectAll = allHrefs.length > 0 && selectedPlaylists.size === allHrefs.length;
 
   const toggleSelectAll = () => {
     if (selectAll) {
-      setCheckedPlaylists(new Set());
+      setSelectedPlaylists(new Set());
     } else {
-      setCheckedPlaylists(new Set(allHrefs));
+      setSelectedPlaylists(new Set(allHrefs));
     }
   };
 
   const togglePlaylist = (href: string) => {
-    setCheckedPlaylists(prev => {
+    setSelectedPlaylists((prev: Set<string>) => {
       const next = new Set(prev);
       if (next.has(href)) {
         next.delete(href);
@@ -66,7 +65,7 @@ const PlaylistGroup = function ({ playlists }: { playlists: Array<any>}) {
                       className="playlist-checkbox"
                       name="playlist[]"
                       value={href}
-                      checked={checkedPlaylists.has(href)}
+                      checked={selectedPlaylists.has(href)}
                       onChange={() => togglePlaylist(href)}
                     />
                     <span className={playlistNameClass}>{playlist?.name}</span>

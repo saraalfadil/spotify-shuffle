@@ -169,7 +169,7 @@ app.get('/shuffle', async function (req, res) {
 	const user_id = req.query.user_id;
 	const include_all_playlists = req.query.include_all_playlists;
 	const include_liked_tracks = req.query.include_liked_tracks;
-	const filter_playlists = req.query.filter_playlists || [];
+	const filter_playlists = [].concat(req.query.filter_playlists || []);
 
 	let all_tracks = [];
 
@@ -194,8 +194,6 @@ app.get('/shuffle', async function (req, res) {
 
 		// Get a list of my playlists 
 		const playlists = await getPlaylists(user_id, 0, access_token);
-
-		console.log("Playlists:", playlists);
 
 		// The limit is 50, so fetch them again
 		const playlists_2 = await getPlaylists(user_id, 50, access_token);
