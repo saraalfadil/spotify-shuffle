@@ -17,6 +17,8 @@ const SITE_URL = process.env.SITE_URL;
 
 const app = express();
 
+const stateStore = new Map();
+
 app.use(express.static(__dirname + '/client/public'))
 	.use(cors())
 	.use(cookieParser());
@@ -28,7 +30,13 @@ app.get('/login', function (req, res) {
 
 	const state = generateRandomString(16);
 
-	res.cookie(STATE_KEY, state);
+	stateStore.set(state, Date.now());
+
+	res.cookie(STATE_KEY, state, { 
+		httpOnly: true, 
+		sameSite: 'lax',
+		secure: false
+	});
 
 	let scope = 'user-read-private user-read-email user-modify-playback-state'
 	scope += ' user-read-playback-state user-library-read playlist-read-private';
@@ -56,15 +64,20 @@ app.get('/callback', async function (req, res) {
 
 	const code = req.query.code || null;
 	const state = req.query.state || null;
-	const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
+	const storedState = stateStore.has(state);
+	// Todo: it seems that the cookie is not being set properly, so using in-memory store instead
+	//const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
 
 	try {
-		if (state === null || state !== storedState) {
+		if (state === null || !storedState /*state !== storedState*/) {
+
+			console.log("State mismatch: ", state, storedState);
 
 			res.send({ message: 'State mismatch' });
 	
 		} else {
 	
+			stateStore.delete(state);
 			res.clearCookie(STATE_KEY);
 	
 			const token_string = await getAccessToken(code);
@@ -182,6 +195,8 @@ app.get('/shuffle', async function (req, res) {
 		// Get a list of my playlists 
 		const playlists = await getPlaylists(user_id, 0, access_token);
 
+		console.log("Playlists:", playlists);
+
 		// The limit is 50, so fetch them again
 		const playlists_2 = await getPlaylists(user_id, 50, access_token);
 
@@ -283,7 +298,9 @@ const getPlaylists = function (user_id, offset, access_token) {
 				if (!error && response.statusCode === 200) {
 
 					let items = body.items;
-					resolve(items);
+					resolve(items ?? []);
+				} else {
+					resolve([]);
 
 				}
 			});
