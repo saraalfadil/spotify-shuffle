@@ -16,22 +16,13 @@ const App = function() {
 
 	const refreshNowPlaying = async () => {
 		try {
-
-			let player = await getPlayerInfo(accessToken);
+			let player = await getPlayerInfo({ accessToken });
 			setPlayingTrack(player.item);
-
 		} catch(e) {
 			setError(e);
 		}
 	}
 	
-	// Filter playlists based on "My playlists only" selection
-	const filterPlaylists = useCallback(playlists => {
-		return playlists.filter(playlist => {
-			return playlist.owner && playlist.owner.id === userId;
-		});
-    }, [userId])
-
 	const refreshPlaylists = myPlaylistsOnly => {
 		if (myPlaylistsOnly) {
 			setMyPlaylists(filterPlaylists(allPlaylists))
@@ -40,33 +31,36 @@ const App = function() {
 		}
 	}
 
+	// Filter playlists based on "My playlists only" selection
+	const filterPlaylists = useCallback(playlists => {
+		return playlists.filter(playlist => {
+			return playlist.owner && playlist.owner.id === userId;
+		});
+    }, [userId])
+
  	useEffect(() => {
 
 		const getData = async () => {
 			try {
-				
+
 				// Populate the now playing track info
-				if (!playingTrack) {
-					let player = await getPlayerInfo({ accessToken });
-					setPlayingTrack(player.item);
-				}
-				
+				let player = await getPlayerInfo({ accessToken });
+				setPlayingTrack(player.item);
+
 				// Pull all playlists
-				if (allPlaylists.length === 0) {
-					let playlists = await getPlaylists({ accessToken, userId });
-					setAllPlaylists(playlists);
-					setMyPlaylists(filterPlaylists(playlists));
-				}
+				let playlists = await getPlaylists({ accessToken, userId });
+				setAllPlaylists(playlists);
+				setMyPlaylists(filterPlaylists(playlists));
 
 			} catch (e) {
 				setError(e);
+			}
 		}
-	}
 
     if (isAuthenticated) 
 		getData();
 
-  }, [isAuthenticated, userId, accessToken, playingTrack, allPlaylists, filterPlaylists]);
+  }, [isAuthenticated, userId, accessToken, filterPlaylists]);
 
   return (
 	<Container>
