@@ -132,6 +132,13 @@ body {
   white-space: nowrap;
 }
 
+.playlist-thumbnail {
+  width: 64px;
+  height: 64px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
 .select-playlists {
 	margin-bottom: 10px;
 }

@@ -57,6 +57,7 @@ const PlaylistGroup = function ({ playlists, selectedPlaylists, setSelectedPlayl
                 let ownedPlaylist = owner && owner.id === userId;
                 let playlistNameClass = ownedPlaylist ? 'owned-playlist' : 'other-playlist';
                 const href = tracks?.href ?? '';
+                const image = playlist?.images?.at(-1)?.url ?? playlist?.images?.[0]?.url;
 
                 return (
                   <li key={href}>
@@ -68,6 +69,7 @@ const PlaylistGroup = function ({ playlists, selectedPlaylists, setSelectedPlayl
                       checked={selectedPlaylists.has(href)}
                       onChange={() => togglePlaylist(href)}
                     />
+                    {image && <img src={image} alt="" className="playlist-thumbnail" />}
                     <span className={playlistNameClass}>{playlist?.name}</span>
                   </li>
                 )

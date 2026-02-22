@@ -7,6 +7,23 @@ import { useAuth } from './context/AuthContext';
 import { getPlayerInfo, getPlaylists } from './utils.ts';
 import './App.css';
 
+const PLAYLIST_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+const getCachedPlaylists = (userId) => {
+	try {
+		const cached = JSON.parse(localStorage.getItem(`playlists_${userId}`));
+		if (cached && Date.now() - cached.timestamp < PLAYLIST_CACHE_TTL)
+			return cached.data;
+	} catch {}
+	return null;
+};
+
+const setCachedPlaylists = (userId, playlists) => {
+	try {
+		localStorage.setItem(`playlists_${userId}`, JSON.stringify({ data: playlists, timestamp: Date.now() }));
+	} catch {}
+};
+
 const App = function() {
 	const [ error, setError ] = useState("");
 	const [ playingTrack, setPlayingTrack ] = useState(null);
@@ -51,7 +68,9 @@ const App = function() {
 
 			try {
 				// Pull all playlists
-				let playlists = await getPlaylists({ accessToken, userId });
+				const cached = getCachedPlaylists(userId);
+				const playlists = cached ?? await getPlaylists({ accessToken, userId });
+				if (!cached) setCachedPlaylists(userId, playlists);
 				setAllPlaylists(playlists);
 				setMyPlaylists(filterPlaylists(playlists));
 			} catch (e) {
