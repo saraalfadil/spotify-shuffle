@@ -62,6 +62,13 @@ const App = function() {
 
   }, [isAuthenticated, userId, accessToken, filterPlaylists]);
 
+    // refresh now playing info every ~3.5 mins (avg song length) to keep the display up to date
+	useEffect(() => {
+		if (!isAuthenticated) return;
+		const interval = setInterval(refreshNowPlaying, 210000);
+		return () => clearInterval(interval);
+	}, [isAuthenticated, accessToken]);
+
   return (
 	<Container>
 		{isAuthenticated ? (
