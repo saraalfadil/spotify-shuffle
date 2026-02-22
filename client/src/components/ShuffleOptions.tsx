@@ -4,12 +4,13 @@ import ShuffleToggle from './ShuffleToggle';
 import PlaylistGroup from './PlaylistGroup';
 
 interface ShuffleOptionsProps {
-	playlists: Array<string>, 
-	refreshNowPlaying: Function, 
-	refreshPlaylists: Function
+	playlists: Array<string>,
+	refreshNowPlaying: Function,
+	refreshPlaylists: Function,
+	onError: Function
 }
 
-const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists }: ShuffleOptionsProps) {
+const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists, onError }: ShuffleOptionsProps) {
 
 	const [ myPlaylistsOnly, setMyPlaylistsOnly ] = useState(true);
 	const [ includeLikedTracks, setIncludeLikedTracks ] = useState(true);
@@ -31,12 +32,13 @@ const ShuffleOptions = function({ playlists, refreshNowPlaying, refreshPlaylists
 
 	return (
 		<div id="settingsContainer">
-			<ShuffleButton 
-				myPlaylistsOnly={myPlaylistsOnly} 
-				includeLikedTracks={includeLikedTracks} 
-				refreshNowPlaying={refreshNowPlaying} 
-				choosePlaylists={choosePlaylists} 
+			<ShuffleButton
+				myPlaylistsOnly={myPlaylistsOnly}
+				includeLikedTracks={includeLikedTracks}
+				refreshNowPlaying={refreshNowPlaying}
+				choosePlaylists={choosePlaylists}
 				selectedPlaylists={selectedPlaylists}
+				onError={onError}
 			/>
 
 			<div className="options-group">

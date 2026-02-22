@@ -9,10 +9,11 @@ interface ShuffleButtonProps {
 	includeLikedTracks: boolean,
 	refreshNowPlaying: Function,
 	choosePlaylists: boolean,
-	selectedPlaylists: Set<string>
+	selectedPlaylists: Set<string>,
+	onError: Function
 }
 
-const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNowPlaying, choosePlaylists, selectedPlaylists }: ShuffleButtonProps ) {
+const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNowPlaying, choosePlaylists, selectedPlaylists, onError }: ShuffleButtonProps ) {
   	const [ isLoading, setIsLoading ] = useState(false);
 	const { accessToken, userId } = useAuth();
 
@@ -20,23 +21,29 @@ const ShuffleButton = function({ myPlaylistsOnly, includeLikedTracks, refreshNow
 
 		setIsLoading(true);
 
-		// Fetch shuffled tracks
-		const allTracks = await getShuffledTracks({
-			access_token: accessToken,
-			user_id: userId,
-			my_playlists_only: myPlaylistsOnly,
-			include_liked_tracks: includeLikedTracks,
-			...(choosePlaylists && { filter_playlists: [...selectedPlaylists] })
-		});
+		try {
+			// Fetch shuffled tracks
+			const allTracks = await getShuffledTracks({
+				access_token: accessToken,
+				user_id: userId,
+				my_playlists_only: myPlaylistsOnly,
+				include_liked_tracks: includeLikedTracks,
+				...(choosePlaylists && { filter_playlists: [...selectedPlaylists] })
+			});
 
-		console.log("Shuffled tracks:", allTracks);
+			// Play shuffled tracks
+			if (allTracks) {
+				await playTracks({ accessToken, allTracks });
 
-		// Play shuffled tracks
-		if (allTracks) 
-			await playTracks({ accessToken, allTracks });
-		
-		// Refresh now playing song
-		await refreshNowPlaying();
+				// Refresh now playing song
+				setTimeout(() => {
+					refreshNowPlaying();
+				}, 1000);
+			}
+
+		} catch (e) {
+			onError(e);
+		}
 
 		setIsLoading(false);
 

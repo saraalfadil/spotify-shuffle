@@ -3,8 +3,6 @@ const SITE_URL = process.env.REACT_APP_SITE_URL;
 
 // Get user information
 export const getUserInfo = async ({ accessToken } : { accessToken: string }) => {
-
-	console.log("accessToken: ", accessToken);
 	try {
 		const response = await fetch(`${SPOTIFY_API_ENDPOINT}/me`, {
 			method: 'GET',
@@ -29,10 +27,11 @@ export const getPlayerInfo = async ({ accessToken } : { accessToken: string}) =>
         'Authorization': 'Bearer ' + accessToken
       }
     });
-    if (!response) {
-      throw new Error('Failed to fetch player information');
-    }
+    if (response.status === 204) {
+		throw new Error(`Nothing playing or player unavailable`);
+	}
     return await response.json();
+	
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Error');
   }
@@ -113,8 +112,10 @@ export const playTracks = async ({ accessToken, allTracks }: { accessToken: stri
           uris: allTracks
       })
     });
-    if (!response) {
-      throw new Error('Failed to fetch player information');
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData?.error?.message || `Request failed with status ${response.status}`);
     }
 
   } catch (error) {

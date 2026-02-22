@@ -42,22 +42,24 @@ const App = function() {
 
 		const getData = async () => {
 			try {
-
 				// Populate the now playing track info
 				let player = await getPlayerInfo({ accessToken });
 				setPlayingTrack(player.item);
+			} catch (e) {
+				setError(e);          
+			}
 
+			try {
 				// Pull all playlists
 				let playlists = await getPlaylists({ accessToken, userId });
 				setAllPlaylists(playlists);
 				setMyPlaylists(filterPlaylists(playlists));
-
 			} catch (e) {
 				setError(e);
 			}
 		}
 
-    if (isAuthenticated) 
+    if (isAuthenticated && userId) 
 		getData();
 
   }, [isAuthenticated, userId, accessToken, filterPlaylists]);
@@ -74,15 +76,17 @@ const App = function() {
 		{isAuthenticated ? (
 			<>	
 				{ error &&
-					<div className="alert alert-danger">
+					<div className="alert alert-danger alert-dismissible" role="alert">
 						{error?.message}
+						<button type="button" onClick={() => setError("")}>&times;</button>
 					</div>
 				}
 				<Player track={playingTrack} />
-				<ShuffleOptions 
+				<ShuffleOptions
 					playlists={myPlaylists}
-					refreshNowPlaying={() => refreshNowPlaying()} 
-					refreshPlaylists={myPlaylistsOnly => refreshPlaylists(myPlaylistsOnly)} 
+					refreshNowPlaying={() => refreshNowPlaying()}
+					refreshPlaylists={myPlaylistsOnly => refreshPlaylists(myPlaylistsOnly)}
+					onError={setError}
 				/>
 			</>
 		) : (
